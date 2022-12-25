@@ -318,7 +318,7 @@ class MainFragment: Fragment() {
             changeBtCaptureVisible(false)
             // 捕まったか確認するダイアログが出現
             changeCaptureDialogVisible(View.VISIBLE)
-
+            viewModel.getTest()
         }
 
         btCaptureNo.setOnClickListener {

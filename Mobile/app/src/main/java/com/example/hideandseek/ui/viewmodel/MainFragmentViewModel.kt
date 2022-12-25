@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.User
 import com.example.hideandseek.data.datasource.local.UserRoomDatabase
+import com.example.hideandseek.data.repository.ApiRepository
 import com.example.hideandseek.data.repository.MapRepository
 import com.example.hideandseek.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,7 @@ import kotlin.math.sqrt
 
 class MainFragmentViewModel: ViewModel() {
     lateinit var allUsersLive: LiveData<List<User>>
+    private val repository = ApiRepository.instance
 
     fun setAllUsersLive(context: Context) {
         allUsersLive = UserRepository(context).allUsers.asLiveData()
@@ -87,6 +89,21 @@ class MainFragmentViewModel: ViewModel() {
 
     fun setMap(p0: Bitmap) {
         _map.value = p0
+    }
+
+    fun getTest() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.getTest()
+                if (response.isSuccessful) {
+                    Log.d("GETTEST", "${response}\n${response.body()}")
+                } else {
+                    Log.d("GETTEST", "$response")
+                }
+            } catch (e: java.lang.Exception){
+                Log.d("GETTEST", "$e")
+            }
+        }
     }
 
     fun setUpDemoList(locationArray: Array<Array<Array<Double?>>>, statusArray: Array<Array<Array<Int?>>>) {
