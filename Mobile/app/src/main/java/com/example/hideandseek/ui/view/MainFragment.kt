@@ -19,6 +19,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModel
 import kotlinx.coroutines.*
@@ -318,7 +319,6 @@ class MainFragment: Fragment() {
             changeBtCaptureVisible(false)
             // 捕まったか確認するダイアログが出現
             changeCaptureDialogVisible(View.VISIBLE)
-
         }
 
         btCaptureNo.setOnClickListener {
