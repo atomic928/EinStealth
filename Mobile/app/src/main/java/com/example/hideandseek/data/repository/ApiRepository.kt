@@ -34,9 +34,6 @@ class ApiRepository {
     suspend fun getSpacetime(time: String): Response<List<ResponseData.ResponseGetSpacetime>> =
         service.getSpacetime(time)
 
-    suspend fun getAllSpacetime(): Response<List<ResponseData.ResponseGetSpacetime>> =
-        service.getAllSpacetime()
-
     suspend fun postSpacetime(request: PostData.PostSpacetime): Response<ResponseData.ResponsePost> =
         service.postSpacetime(request)
 

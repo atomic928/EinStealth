@@ -17,9 +17,6 @@ interface RestApi {
     @GET("api/v1/spacetimes")
     suspend fun getSpacetime(@Query("time") time: String): Response<List<ResponseData.ResponseGetSpacetime>>
 
-    @GET("api/v1/spacetimes")
-    suspend fun getAllSpacetime(): Response<List<ResponseData.ResponseGetSpacetime>>
-
     @POST("api/v1/spacetimes")
     suspend fun postSpacetime(@Body request: PostData.PostSpacetime): Response<ResponseData.ResponsePost>
 }
