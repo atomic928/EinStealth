@@ -1,6 +1,7 @@
 package com.example.hideandseek.data.repository
 
 import com.example.hideandseek.data.datasource.remote.Params.Companion.BASE_URL
+import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.datasource.remote.ResponseData
 import com.example.hideandseek.data.datasource.remote.RestApi
 import okhttp3.OkHttpClient
@@ -26,6 +27,15 @@ class ApiRepository {
 
     suspend fun getTest(): Response<ResponseData.ResponseGetTest> =
         service.getTest()
+
+    suspend fun postStatus(id: Int, status: Int): Response<ResponseData.ResponsePost> =
+        service.postStatus(id, status)
+
+    suspend fun getSpacetime(time: String): Response<ResponseData.ResponseGetSpacetime> =
+        service.getSpacetime(time)
+
+    suspend fun postSpacetime(request: PostData.PostSpacetime): Response<ResponseData.ResponsePost> =
+        service.postSpacetime(request)
 
     companion object Factory {
         val instance: ApiRepository

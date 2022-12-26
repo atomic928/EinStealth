@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.User
 import com.example.hideandseek.data.datasource.local.UserRoomDatabase
+import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.repository.ApiRepository
 import com.example.hideandseek.data.repository.MapRepository
 import com.example.hideandseek.data.repository.UserRepository
@@ -95,6 +96,51 @@ class MainFragmentViewModel: ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = repository.getTest()
+                if (response.isSuccessful) {
+                    Log.d("GETTEST", "${response}\n${response.body()}")
+                } else {
+                    Log.d("GETTEST", "$response")
+                }
+            } catch (e: java.lang.Exception){
+                Log.d("GETTEST", "$e")
+            }
+        }
+    }
+
+    fun postStatus(id: Int, status: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.postStatus(id, status)
+                if (response.isSuccessful) {
+                    Log.d("GETTEST", "${response}\n${response.body()}")
+                } else {
+                    Log.d("GETTEST", "$response")
+                }
+            } catch (e: java.lang.Exception){
+                Log.d("GETTEST", "$e")
+            }
+        }
+    }
+
+    fun getSpacetime(time: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.getSpacetime(time)
+                if (response.isSuccessful) {
+                    Log.d("GETTEST", "${response}\n${response.body()}")
+                } else {
+                    Log.d("GETTEST", "$response")
+                }
+            } catch (e: java.lang.Exception){
+                Log.d("GETTEST", "$e")
+            }
+        }
+    }
+
+    fun postSpacetime(request: PostData.PostSpacetime) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.postSpacetime(request)
                 if (response.isSuccessful) {
                     Log.d("GETTEST", "${response}\n${response.body()}")
                 } else {
