@@ -319,8 +319,9 @@ class MainFragment: Fragment() {
             changeBtCaptureVisible(false)
             // 捕まったか確認するダイアログが出現
             changeCaptureDialogVisible(View.VISIBLE)
-            viewModel.postSpacetime(PostData.PostSpacetime("test", 0f, 0f, 0f, 0))
+//            viewModel.postSpacetime(PostData.PostSpacetime("00:00:00", 0f, 0f, 0f, 0))
             viewModel.getSpacetime("00:00:00")
+//            viewModel.getAllSpacetime()
         }
 
         btCaptureNo.setOnClickListener {

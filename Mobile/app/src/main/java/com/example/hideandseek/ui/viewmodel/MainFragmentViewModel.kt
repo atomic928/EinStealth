@@ -137,10 +137,10 @@ class MainFragmentViewModel: ViewModel() {
         }
     }
 
-    fun postSpacetime(request: PostData.PostSpacetime) {
+    fun getAllSpacetime() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = repository.postSpacetime(request)
+                val response = repository.getAllSpacetime()
                 if (response.isSuccessful) {
                     Log.d("GETTEST", "${response}\n${response.body()}")
                 } else {
@@ -148,6 +148,21 @@ class MainFragmentViewModel: ViewModel() {
                 }
             } catch (e: java.lang.Exception){
                 Log.d("GETTEST", "$e")
+            }
+        }
+    }
+
+    fun postSpacetime(request: PostData.PostSpacetime) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.postSpacetime(request)
+                if (response.isSuccessful) {
+                    Log.d("POSTTEST", "${response}\n${response.body()}")
+                } else {
+                    Log.d("POSTTEST", "$response")
+                }
+            } catch (e: java.lang.Exception){
+                Log.d("POSTTEST", "$e")
             }
         }
     }

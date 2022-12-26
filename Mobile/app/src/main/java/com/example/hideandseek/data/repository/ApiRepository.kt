@@ -31,11 +31,15 @@ class ApiRepository {
     suspend fun postStatus(id: Int, status: Int): Response<ResponseData.ResponsePost> =
         service.postStatus(id, status)
 
-    suspend fun getSpacetime(time: String): Response<ResponseData.ResponseGetSpacetime> =
+    suspend fun getSpacetime(time: String): Response<List<ResponseData.ResponseGetSpacetime>> =
         service.getSpacetime(time)
+
+    suspend fun getAllSpacetime(): Response<List<ResponseData.ResponseGetSpacetime>> =
+        service.getAllSpacetime()
 
     suspend fun postSpacetime(request: PostData.PostSpacetime): Response<ResponseData.ResponsePost> =
         service.postSpacetime(request)
+
 
     companion object Factory {
         val instance: ApiRepository
