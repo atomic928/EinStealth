@@ -8,6 +8,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.User
+import com.example.hideandseek.data.datasource.remote.PostData
+import com.example.hideandseek.data.repository.ApiRepository
 import com.example.hideandseek.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -29,6 +31,8 @@ data class MainActivityUiState(
 class MainActivityViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(MainActivityUiState())
     val uiState: StateFlow<MainActivityUiState> = _uiState.asStateFlow()
+
+    private val repository = ApiRepository.instance
 
     // relativeTimeの初期値（アプリを起動したときのLocalTime）をセットする
     fun setUpRelativeTime(nowTime: LocalTime) {
@@ -56,9 +60,25 @@ class MainActivityViewModel: ViewModel() {
 
     // ActivityからrelativeTimeとlocationを受け取り、Roomデータベースにuserデータとして送信
     fun insert(relativeTime: LocalTime, location: Location, context: Context) = viewModelScope.launch {
-        val user = User(0, relativeTime.toString().substring(0, 8), location.longitude, location.latitude)
+        val user = User(0, relativeTime.toString().substring(0, 8), location.latitude, location.longitude, location.altitude, 0)
         withContext(Dispatchers.IO) {
             UserRepository(context).insert(user)
+        }
+    }
+
+    fun postSpacetime(relativeTime: LocalTime, location: Location) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val request = PostData.PostSpacetime(relativeTime.toString().substring(0, 8), location.latitude, location.longitude, location.altitude, 0)
+                val response = repository.postSpacetime(request)
+                if (response.isSuccessful) {
+                    Log.d("POSTTEST", "${response}\n${response.body()}")
+                } else {
+                    Log.d("POSTTEST", "$response")
+                }
+            } catch (e: java.lang.Exception){
+                Log.d("POSTTEST", "$e")
+            }
         }
     }
 

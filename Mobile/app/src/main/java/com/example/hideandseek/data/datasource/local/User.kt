@@ -8,6 +8,8 @@ import androidx.room.PrimaryKey
 data class User(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "relative_time") val relativeTime: String,
+    @ColumnInfo(name = "latitude") val latitude: Double,
     @ColumnInfo(name = "longitude") val longitude: Double,
-    @ColumnInfo(name = "latitude") val latitude: Double
+    @ColumnInfo(name = "altitude") val altitude: Double,
+    @ColumnInfo(name = "obj_id") val objId: Int
 )

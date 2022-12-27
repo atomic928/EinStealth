@@ -163,6 +163,8 @@ class MainActivity : AppCompatActivity() {
                 viewModel.uiState.collect {
                     // Update UI elements
                     viewModel.insert(it.relativeTime, location, applicationContext)
+                    viewModel.postSpacetime(it.relativeTime, location)
+                    // TODO: GETしてデータベースに送る
                 }
             }
         }

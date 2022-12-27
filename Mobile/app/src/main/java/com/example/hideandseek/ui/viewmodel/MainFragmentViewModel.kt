@@ -137,21 +137,6 @@ class MainFragmentViewModel: ViewModel() {
         }
     }
 
-    fun postSpacetime(request: PostData.PostSpacetime) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = repository.postSpacetime(request)
-                if (response.isSuccessful) {
-                    Log.d("POSTTEST", "${response}\n${response.body()}")
-                } else {
-                    Log.d("POSTTEST", "$response")
-                }
-            } catch (e: java.lang.Exception){
-                Log.d("POSTTEST", "$e")
-            }
-        }
-    }
-
     fun setUpDemoList(locationArray: Array<Array<Array<Double?>>>, statusArray: Array<Array<Array<Int?>>>) {
         // デモ用のリスト作成
         for (i in 0..239) {
