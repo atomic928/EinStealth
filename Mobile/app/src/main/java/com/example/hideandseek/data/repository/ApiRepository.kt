@@ -1,6 +1,9 @@
 package com.example.hideandseek.data.repository
 
-import com.example.hideandseek.data.datasource.remote.Params.Companion.BASE_URL
+import android.os.Build
+import android.util.Log
+import com.example.hideandseek.data.datasource.remote.Params
+import com.example.hideandseek.data.datasource.remote.Params.Companion.BASE_URL_REAL
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.datasource.remote.ResponseData
 import com.example.hideandseek.data.datasource.remote.RestApi
@@ -19,7 +22,7 @@ class ApiRepository {
         .build()
 
     private val service: RestApi = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(setBaseUrl())
         .addConverterFactory(MoshiConverterFactory.create())
         .client(client)
         .build()
@@ -43,5 +46,26 @@ class ApiRepository {
             @Synchronized get() {
                 return ApiRepository()
             }
+    }
+
+    private fun setBaseUrl(): String {
+        return if (isEmulator()) {
+            Params.BASE_URL_EMULATOR
+        } else {
+            BASE_URL_REAL
+        }
+    }
+
+    private fun isEmulator(): Boolean {
+        return Build.FINGERPRINT.startsWith("generic") ||
+                Build.FINGERPRINT.startsWith("unknown") ||
+                Build.MODEL.contains("google_sdk") ||
+                Build.MODEL.contains("Emulator") ||
+                Build.MODEL.contains("Android SDK built for x86") ||
+                Build.MODEL.contains("sdk_phone_armv7") ||
+                Build.MANUFACTURER.contains("Genymotion") ||
+                (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")) ||
+                Build.PRODUCT == "google_sdk" ||
+                Build.PRODUCT == "sdk_gphone_x86"
     }
 }
