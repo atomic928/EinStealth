@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.User
 import com.example.hideandseek.data.datasource.remote.PostData
+import com.example.hideandseek.data.datasource.remote.ResponseData
 import com.example.hideandseek.data.repository.ApiRepository
 import com.example.hideandseek.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +67,15 @@ class MainActivityViewModel: ViewModel() {
         }
     }
 
+    private fun insertAll(relativeTime: LocalTime, response: List<ResponseData.ResponseGetSpacetime>, context: Context) = viewModelScope.launch {
+        for (i in response.indices) {
+            val user = User(0, relativeTime.toString().substring(0, 8), response[i].latitude, response[i].longitude, response[i].altitude, 0)
+            withContext(Dispatchers.IO) {
+                UserRepository(context).insert(user)
+            }
+        }
+    }
+
     fun postSpacetime(relativeTime: LocalTime, location: Location) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -78,6 +88,22 @@ class MainActivityViewModel: ViewModel() {
                 }
             } catch (e: java.lang.Exception){
                 Log.d("POSTTEST", "$e")
+            }
+        }
+    }
+
+    fun getSpacetime(relativeTime: LocalTime, context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.getSpacetime(relativeTime.toString().substring(0, 8))
+                if (response.isSuccessful) {
+                    Log.d("GETTEST", "${response}\n${response.body()}")
+                    response.body()?.let { insertAll(relativeTime, it, context) }
+                } else {
+                    Log.d("GETTEST", "$response")
+                }
+            } catch (e: java.lang.Exception){
+                Log.d("GETTEST", "$e")
             }
         }
     }
