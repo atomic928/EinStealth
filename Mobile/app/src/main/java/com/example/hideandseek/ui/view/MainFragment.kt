@@ -32,13 +32,6 @@ class MainFragment: Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val viewModel: MainFragmentViewModel by viewModels()
 
-    // latitude, longitudeのリスト
-    private val locationArray = Array(240) {
-        Array(3) {
-            arrayOfNulls<Double>(2)
-        }
-    }
-
     private val statusArray = Array(240) {
         Array(3) {
             arrayOfNulls<Int>(2)
@@ -64,9 +57,6 @@ class MainFragment: Fragment() {
     ): View? {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-        // デモ用のデータのセットアップ
-        viewModel.setUpDemoList(locationArray, statusArray)
         
         // Viewの取得
         // 時間表示の場所

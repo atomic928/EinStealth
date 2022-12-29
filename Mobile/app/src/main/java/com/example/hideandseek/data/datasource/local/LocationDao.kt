@@ -9,22 +9,19 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface UserDao {
+interface LocationDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(user: User)
+    suspend fun insert(user: LocationData)
 
     @Update
-    fun update(user: User)
+    fun update(user: LocationData)
 
     @Delete
-    fun delete(user: User)
+    fun delete(user: LocationData)
 
-    @Query("SELECT * FROM user_table")
-    fun getAll(): Flow<List<User>>
+    @Query("SELECT * FROM location_table")
+    fun getAll(): Flow<List<LocationData>>
 
-    @Query("DELETE FROM user_table")
+    @Query("DELETE FROM location_table")
     suspend fun deleteAll()
-
-    @Query("SELECT * FROM user_table WHERE relative_time = :relativeTime")
-    fun getLocation(relativeTime: String): Flow<List<User>>
 }
