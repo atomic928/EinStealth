@@ -111,8 +111,6 @@ class MainActivity : AppCompatActivity() {
                 if (location != null) {
                     // 相対時間の初期化
                     viewModel.setUpRelativeTime(LocalTime.now())
-                    // Roomデータベースの初期化
-                    viewModel.deleteAll(applicationContext)
                     postCalculatedRelativeTime(location)
                 }
             }
@@ -162,7 +160,10 @@ class MainActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     // Update UI elements
+                    viewModel.deleteAll(applicationContext)
                     viewModel.insert(it.relativeTime, location, applicationContext)
+                    viewModel.postSpacetime(it.relativeTime, location)
+                    viewModel.getSpacetime(it.relativeTime, applicationContext)
                 }
             }
         }

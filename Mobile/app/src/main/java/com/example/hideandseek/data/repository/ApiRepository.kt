@@ -3,7 +3,6 @@ package com.example.hideandseek.data.repository
 import android.os.Build
 import android.util.Log
 import com.example.hideandseek.data.datasource.remote.Params
-import com.example.hideandseek.data.datasource.remote.Params.Companion.BASE_URL
 import com.example.hideandseek.data.datasource.remote.Params.Companion.BASE_URL_REAL
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.datasource.remote.ResponseData
