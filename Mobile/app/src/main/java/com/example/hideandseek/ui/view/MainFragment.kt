@@ -221,11 +221,13 @@ class MainFragment: Fragment() {
 
 
         // データベースからデータを持ってくる
-        context?.let { viewModel.setAllUsersLive(it) }
+        context?.let {
+            viewModel.setAllLocationsLive(it)
+            viewModel.setUserLive(it)
+        }
 
-        // データが更新されたら表示
-        viewModel.allUsersLive.observe(viewLifecycleOwner) {
-            Log.d("USER", it.toString())
+        // 自分の情報の表示
+        viewModel.userLive.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
                 viewModel.setLimitTime(it[0].relativeTime)
                 tvRelativeTime.text = it[it.size-1].relativeTime
@@ -233,6 +235,12 @@ class MainFragment: Fragment() {
                 viewModel.limitTime.observe(viewLifecycleOwner) { limitTime ->
                     viewModel.compareTime(it[it.size-1].relativeTime, limitTime)
                 }
+            }
+        }
+
+        // データが更新されたら位置を表示
+        viewModel.allLocationsLive.observe(viewLifecycleOwner) {
+            if (it.isNotEmpty()) {
                 // URLから画像を取得
                 val iconUrlHide = "https://onl.tw/3n6JcpK"
                 var url = "https://maps.googleapis.com/maps/api/staticmap" +
@@ -338,10 +346,12 @@ class MainFragment: Fragment() {
 
         // skillボタンが押された時の処理
         btSkillOn.setOnClickListener {
-            viewModel.allUsersLive.observe(viewLifecycleOwner) {
-                trapArray[trapNumber][0] = it[it.size-1].latitude
-                trapArray[trapNumber][1] = it[it.size-1].longitude
-                skillTime[trapNumber]    = it[it.size-1].relativeTime
+            viewModel.userLive.observe(viewLifecycleOwner) {
+                if (it.isNotEmpty()) {
+                    trapArray[trapNumber][0] = it[it.size-1].latitude
+                    trapArray[trapNumber][1] = it[it.size-1].longitude
+                    skillTime[trapNumber]    = it[it.size-1].relativeTime
+                }
             }
             viewModel.setIsOverSkillTime(false)
             trapNumber += 1

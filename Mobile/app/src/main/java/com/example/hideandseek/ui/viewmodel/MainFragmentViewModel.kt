@@ -5,18 +5,26 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.LocationData
+import com.example.hideandseek.data.datasource.local.UserDao
+import com.example.hideandseek.data.datasource.local.UserData
 import com.example.hideandseek.data.repository.ApiRepository
 import com.example.hideandseek.data.repository.MapRepository
 import com.example.hideandseek.data.repository.LocationRepository
+import com.example.hideandseek.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainFragmentViewModel: ViewModel() {
-    lateinit var allUsersLive: LiveData<List<LocationData>>
+    lateinit var allLocationsLive: LiveData<List<LocationData>>
+    lateinit var userLive: LiveData<List<UserData>>
     private val repository = ApiRepository.instance
 
-    fun setAllUsersLive(context: Context) {
-        allUsersLive = LocationRepository(context).allUsers.asLiveData()
+    fun setAllLocationsLive(context: Context) {
+        allLocationsLive = LocationRepository(context).allLocations.asLiveData()
+    }
+
+    fun setUserLive(context: Context) {
+        userLive = UserRepository(context).allUsers.asLiveData()
     }
 
     private val _limitTime = MutableLiveData<String>()

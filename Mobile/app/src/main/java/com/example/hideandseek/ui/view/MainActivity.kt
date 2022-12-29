@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.uiState.collect {
                     // Update UI elements
                     viewModel.deleteAll(applicationContext)
-                    viewModel.insert(it.relativeTime, location, applicationContext)
+                    viewModel.insertUser(it.relativeTime, location, applicationContext)
                     viewModel.postSpacetime(it.relativeTime, location)
                     viewModel.getSpacetime(it.relativeTime, applicationContext)
                 }

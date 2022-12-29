@@ -10,7 +10,7 @@ class LocationRepository (private val context: Context) {
 
     private val locationDao: LocationDao by lazy { LocationRoomDatabase.getInstance(context).locationDao() }
 
-    val allUsers: Flow<List<LocationData>> = locationDao.getAll()
+    val allLocations: Flow<List<LocationData>> = locationDao.getAll()
 
     suspend fun insert(user: LocationData) {
         locationDao.insert(user)
