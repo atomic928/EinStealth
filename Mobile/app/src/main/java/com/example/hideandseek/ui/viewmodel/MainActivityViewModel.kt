@@ -69,7 +69,7 @@ class MainActivityViewModel: ViewModel() {
 
     private fun insertAll(relativeTime: LocalTime, response: List<ResponseData.ResponseGetSpacetime>, context: Context) = viewModelScope.launch {
         for (i in response.indices) {
-            val user = User(0, relativeTime.toString().substring(0, 8), response[i].latitude, response[i].longitude, response[i].altitude, 0)
+            val user = User(0, relativeTime.toString().substring(0, 8), response[i].Latitude, response[i].Longtitude, response[i].Altitude, 0)
             withContext(Dispatchers.IO) {
                 UserRepository(context).insert(user)
             }

@@ -6,8 +6,8 @@ class PostData {
     data class PostSpacetime(
         @Json(name = "time") val time: String,
         @Json(name = "latitude") val latitude: Double,
-        @Json(name = "longitude") val longitude: Double,
+        @Json(name = "longtitude") val longtitude: Double,
         @Json(name = "altitude") val altitude: Double,
-        @Json(name = "objId") val objId: Int
+        @Json(name = "obj_id") val obj_id: Int
     )
 }
