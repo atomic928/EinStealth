@@ -255,13 +255,6 @@ class MainFragment: Fragment() {
                 for (i in it.indices) {
                     url += "&markers=icon:" + iconUrlHide + "|${it[i].latitude},${it[i].longitude}"
                 }
-//                for (i in 0..2) {
-//                    var iconUrl = "https://onl.tw/3n6JcpK"
-//                    if (statusArray[it[it.size-1].relativeTime.substring(6).toInt()*2][i][0] == 1) {
-//                        iconUrl = "https://onl.tw/nPGwaP9"
-//                    }
-//                    url += "&markers=icon:" + iconUrl + "|${locationArray[it[it.size-1].relativeTime.substring(6).toInt()*2][i][0]},${locationArray[it[it.size-1].relativeTime.substring(6).toInt()][i][1]}"
-//                }
 
                 // trapの位置情報
                 if (trapNumber > 0) {
