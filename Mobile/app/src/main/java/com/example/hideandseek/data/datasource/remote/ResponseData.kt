@@ -12,9 +12,9 @@ class ResponseData {
     )
 
     data class ResponseGetSpacetime(
-        @Json(name = "latitude") val latitude: Double,
-        @Json(name = "longitude") val longitude: Double,
-        @Json(name = "altitude") val altitude: Double,
-        @Json(name = "objId") val objId: Int
+        @Json(name = "Latitude") val Latitude: Double,
+        @Json(name = "Longtitude") val Longtitude: Double,
+        @Json(name = "Altitude") val Altitude: Double,
+        @Json(name = "ObjId") val ObjId: Int
     )
 }
