@@ -239,25 +239,29 @@ class MainFragment: Fragment() {
             if (it.isNotEmpty()) {
                 viewModel.setLimitTime(it[0].relativeTime)
                 tvRelativeTime.text = it[it.size-1].relativeTime
+                // 制限時間になったかどうかの判定
                 viewModel.limitTime.observe(viewLifecycleOwner) { limitTime ->
                     viewModel.compareTime(it[it.size-1].relativeTime, limitTime)
                 }
                 // URLから画像を取得
+                val iconUrlHide = "https://onl.tw/3n6JcpK"
                 var url = "https://maps.googleapis.com/maps/api/staticmap" +
                         "?center=${it[it.size-1].latitude},${it[it.size-1].longitude}" +
                         "&size=310x640&scale=1" +
                         "&zoom=18" +
-                        "&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ" +
-                        "&markers=icon:https://onl.tw/FkXBADq|${it[it.size-1].latitude},${it[it.size-1].longitude}"
+                        "&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ"
 
-                // 他のユーザーの位置情報
-                for (i in 0..2) {
-                    var iconUrl = "https://onl.tw/3n6JcpK"
-                    if (statusArray[it[it.size-1].relativeTime.substring(6).toInt()*2][i][0] == 1) {
-                        iconUrl = "https://onl.tw/nPGwaP9"
-                    }
-                    url += "&markers=icon:" + iconUrl + "|${locationArray[it[it.size-1].relativeTime.substring(6).toInt()*2][i][0]},${locationArray[it[it.size-1].relativeTime.substring(6).toInt()][i][1]}"
+                // ユーザーの位置情報
+                for (i in it.indices) {
+                    url += "&markers=icon:" + iconUrlHide + "|${it[i].latitude},${it[i].longitude}"
                 }
+//                for (i in 0..2) {
+//                    var iconUrl = "https://onl.tw/3n6JcpK"
+//                    if (statusArray[it[it.size-1].relativeTime.substring(6).toInt()*2][i][0] == 1) {
+//                        iconUrl = "https://onl.tw/nPGwaP9"
+//                    }
+//                    url += "&markers=icon:" + iconUrl + "|${locationArray[it[it.size-1].relativeTime.substring(6).toInt()*2][i][0]},${locationArray[it[it.size-1].relativeTime.substring(6).toInt()][i][1]}"
+//                }
 
                 // trapの位置情報
                 if (trapNumber > 0) {
