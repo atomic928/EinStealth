@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.WindowMetrics
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -21,6 +22,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.window.layout.WindowMetricsCalculator
 import com.example.hideandseek.R
 import com.example.hideandseek.data.datasource.local.User
 import com.example.hideandseek.data.datasource.local.UserRoomDatabase
@@ -57,6 +59,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // 画面サイズの取得
+        computeWindowSizeClasses()
 
         // Viewの取得
         val navView: BottomNavigationView = binding.navView
@@ -196,5 +201,17 @@ class MainActivity : AppCompatActivity() {
     // 位置情報の更新を止める関数
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    // 画面のサイズを取得
+    private fun computeWindowSizeClasses() {
+        val metrics = WindowMetricsCalculator.getOrCreate()
+            .computeCurrentWindowMetrics(this)
+
+        val widthDp = metrics.bounds.width() /
+                resources.displayMetrics.density
+
+        val heightDp = metrics.bounds.height() /
+                resources.displayMetrics.density
     }
 }
