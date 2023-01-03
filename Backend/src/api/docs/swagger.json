@@ -130,7 +130,7 @@
                 "latitude": {
                     "type": "number"
                 },
-                "longtitude": {
+                "longitude": {
                     "type": "number"
                 },
                 "objId": {
@@ -148,7 +148,7 @@
                 "latitude": {
                     "type": "number"
                 },
-                "longtitude": {
+                "longitude": {
                     "type": "number"
                 },
                 "obj_id": {

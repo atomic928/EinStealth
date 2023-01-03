@@ -33,7 +33,7 @@ CREATE TABLE `spacetimes` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `time` time,
     `latitude` float NOT NULL,
-    `longtitude` float NOT NULL,
+    `longitude` float NOT NULL,
     `altitude` float NOT NULL,
     `obj_id` int,
     PRIMARY KEY (`id`)

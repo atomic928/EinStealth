@@ -139,7 +139,7 @@ const docTemplate = `{
                 "latitude": {
                     "type": "number"
                 },
-                "longtitude": {
+                "longitude": {
                     "type": "number"
                 },
                 "objId": {
@@ -157,7 +157,7 @@ const docTemplate = `{
                 "latitude": {
                     "type": "number"
                 },
-                "longtitude": {
+                "longitude": {
                     "type": "number"
                 },
                 "obj_id": {

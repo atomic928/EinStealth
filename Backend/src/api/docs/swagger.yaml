@@ -5,7 +5,7 @@ definitions:
         type: number
       latitude:
         type: number
-      longtitude:
+      longitude:
         type: number
       objId:
         description: '人: player_id, 罠: player_id*(-1)'
@@ -17,7 +17,7 @@ definitions:
         type: number
       latitude:
         type: number
-      longtitude:
+      longitude:
         type: number
       obj_id:
         type: integer
