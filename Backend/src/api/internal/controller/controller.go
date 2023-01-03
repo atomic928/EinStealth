@@ -82,15 +82,15 @@ func GetSpaceTimes(c *gin.Context) {
 
 	// 受け取ったものをJsonResponseに詰め直す
 	type JsonResponse struct {
-		Latitude   float32
-		Longtitude float32
-		Altitude   float32
-		ObjId      int // 人: player_id, 罠: player_id*(-1)
+		Latitude  float32
+		Longitude float32
+		Altitude  float32
+		ObjId     int // 人: player_id, 罠: player_id*(-1)
 	}
 	jsonRes := make([]JsonResponse, len(res))
 	for i := 0; i < len(res); i++ {
 		jsonRes[i].Latitude = res[i].Latitude
-		jsonRes[i].Longtitude = res[i].Longtitude
+		jsonRes[i].Longitude = res[i].Longitude
 		jsonRes[i].Altitude = res[i].Altitude
 		jsonRes[i].ObjId = res[i].ObjId
 	}
@@ -108,11 +108,11 @@ func GetSpaceTimes(c *gin.Context) {
 func PostSpaceTimes(c *gin.Context) {
 	// param取得
 	type JsonRequest struct {
-		Time       string  `json:"time"`
-		Latitude   float32 `json:"latitude"`
-		Longtitude float32 `json:"longtitude"`
-		Altitude   float32 `json:"altitude"`
-		ObjId      int     `json:"obj_id"`
+		Time      string  `json:"time"`
+		Latitude  float32 `json:"latitude"`
+		Longitude float32 `json:"longitude"`
+		Altitude  float32 `json:"altitude"`
+		ObjId     int     `json:"obj_id"`
 	}
 	var req JsonRequest
 	err := c.ShouldBindJSON(&req)
@@ -124,7 +124,7 @@ func PostSpaceTimes(c *gin.Context) {
 	}
 
 	// spacetimesに受け取ったパラメータをpostする
-	err = spacetime.Post(req.Time, req.Latitude, req.Longtitude, req.Altitude, req.ObjId)
+	err = spacetime.Post(req.Time, req.Latitude, req.Longitude, req.Altitude, req.ObjId)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": err.Error(),
