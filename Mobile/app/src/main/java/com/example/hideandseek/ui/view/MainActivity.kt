@@ -2,16 +2,11 @@ package com.example.hideandseek.ui.view
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
 import android.os.Looper
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
@@ -22,19 +17,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.hideandseek.R
-import com.example.hideandseek.data.datasource.local.User
-import com.example.hideandseek.data.datasource.local.UserRoomDatabase
 import com.example.hideandseek.databinding.ActivityMainBinding
 import com.example.hideandseek.ui.viewmodel.MainActivityViewModel
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.net.URL
 import java.time.LocalTime
 
 
@@ -111,6 +99,8 @@ class MainActivity : AppCompatActivity() {
                 if (location != null) {
                     // 相対時間の初期化
                     viewModel.setUpRelativeTime(LocalTime.now())
+                    // User情報の初期化はアプリの起動時にのみ行う
+                    viewModel.deleteAllUser(applicationContext)
                     postCalculatedRelativeTime(location)
                 }
             }
@@ -160,8 +150,8 @@ class MainActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     // Update UI elements
-                    viewModel.deleteAll(applicationContext)
-                    viewModel.insert(it.relativeTime, location, applicationContext)
+                    viewModel.deleteAllLocation(applicationContext)
+                    viewModel.insertUser(it.relativeTime, location, applicationContext)
                     viewModel.postSpacetime(it.relativeTime, location)
                     viewModel.getSpacetime(it.relativeTime, applicationContext)
                 }

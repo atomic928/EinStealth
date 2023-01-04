@@ -6,23 +6,23 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [UserData::class], version = 1, exportSchema = false)
-abstract class UserRoomDatabase: RoomDatabase(), ViewModelProvider.Factory {
+@Database(entities = [LocationData::class], version = 1, exportSchema = false)
+abstract class LocationRoomDatabase: RoomDatabase(), ViewModelProvider.Factory {
 
-    abstract fun userDao() : UserDao
+    abstract fun locationDao() : LocationDao
 
     companion object {
-        private var INSTANCE: UserRoomDatabase? = null
+        private var INSTANCE: LocationRoomDatabase? = null
 
         private val lock = Any()
 
-        fun getInstance(context: Context): UserRoomDatabase {
+        fun getInstance(context: Context): LocationRoomDatabase {
             synchronized(lock) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
-                        UserRoomDatabase::class.java,
-                        "user_db3"
+                        LocationRoomDatabase::class.java,
+                        "location_db"
                     )
                         .allowMainThreadQueries()
                         .build()

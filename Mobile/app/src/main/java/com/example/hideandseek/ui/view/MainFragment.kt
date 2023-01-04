@@ -32,13 +32,6 @@ class MainFragment: Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val viewModel: MainFragmentViewModel by viewModels()
 
-    // latitude, longitudeのリスト
-    private val locationArray = Array(240) {
-        Array(3) {
-            arrayOfNulls<Double>(2)
-        }
-    }
-
     private val statusArray = Array(240) {
         Array(3) {
             arrayOfNulls<Int>(2)
@@ -64,9 +57,6 @@ class MainFragment: Fragment() {
     ): View? {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-        // デモ用のデータのセットアップ
-        viewModel.setUpDemoList(locationArray, statusArray)
         
         // Viewの取得
         // 時間表示の場所
@@ -231,11 +221,14 @@ class MainFragment: Fragment() {
 
 
         // データベースからデータを持ってくる
-        context?.let { viewModel.setAllUsersLive(it) }
+        context?.let {
+            viewModel.setAllLocationsLive(it)
+            viewModel.setUserLive(it)
+        }
 
-        // データが更新されたら表示
-        viewModel.allUsersLive.observe(viewLifecycleOwner) {
-            Log.d("USER", it.toString())
+        // 自分の情報の表示
+        viewModel.userLive.observe(viewLifecycleOwner) {
+            Log.d("UserLive", it.toString())
             if (it.isNotEmpty()) {
                 viewModel.setLimitTime(it[0].relativeTime)
                 tvRelativeTime.text = it[it.size-1].relativeTime
@@ -243,6 +236,12 @@ class MainFragment: Fragment() {
                 viewModel.limitTime.observe(viewLifecycleOwner) { limitTime ->
                     viewModel.compareTime(it[it.size-1].relativeTime, limitTime)
                 }
+            }
+        }
+
+        // データが更新されたら位置を表示
+        viewModel.allLocationsLive.observe(viewLifecycleOwner) {
+            if (it.isNotEmpty()) {
                 // URLから画像を取得
                 val iconUrlHide = "https://onl.tw/3n6JcpK"
                 var url = "https://maps.googleapis.com/maps/api/staticmap" +
@@ -348,7 +347,8 @@ class MainFragment: Fragment() {
 
         // skillボタンが押された時の処理
         btSkillOn.setOnClickListener {
-            viewModel.allUsersLive.observe(viewLifecycleOwner) {
+            // Userの最新情報から位置をとってきて、それを罠の位置とする
+            viewModel.userLive.observe(viewLifecycleOwner) {
                 trapArray[trapNumber][0] = it[it.size-1].latitude
                 trapArray[trapNumber][1] = it[it.size-1].longitude
                 skillTime[trapNumber]    = it[it.size-1].relativeTime

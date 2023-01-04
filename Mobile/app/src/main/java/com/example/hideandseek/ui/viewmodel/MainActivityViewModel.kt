@@ -1,19 +1,15 @@
 package com.example.hideandseek.ui.viewmodel
 
-import android.app.Application
 import android.content.Context
 import android.location.Location
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
-import com.example.hideandseek.data.datasource.local.User
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.datasource.remote.ResponseData
 import com.example.hideandseek.data.repository.ApiRepository
+import com.example.hideandseek.data.repository.LocationRepository
 import com.example.hideandseek.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,18 +56,20 @@ class MainActivityViewModel: ViewModel() {
     }
 
     // ActivityからrelativeTimeとlocationを受け取り、Roomデータベースにuserデータとして送信
-    fun insert(relativeTime: LocalTime, location: Location, context: Context) = viewModelScope.launch {
-        val user = User(0, relativeTime.toString().substring(0, 8), location.latitude, location.longitude, location.altitude, 0)
+    fun insertUser(relativeTime: LocalTime, location: Location, context: Context) = viewModelScope.launch {
+        val user =
+            com.example.hideandseek.data.datasource.local.UserData(0, relativeTime.toString().substring(0, 8), location.latitude, location.longitude)
         withContext(Dispatchers.IO) {
             UserRepository(context).insert(user)
         }
     }
 
-    private fun insertAll(relativeTime: LocalTime, response: List<ResponseData.ResponseGetSpacetime>, context: Context) = viewModelScope.launch {
+    private fun insertLocationAll(relativeTime: LocalTime, response: List<ResponseData.ResponseGetSpacetime>, context: Context) = viewModelScope.launch {
         for (i in response.indices) {
-            val user = User(0, relativeTime.toString().substring(0, 8), response[i].Latitude, response[i].Longtitude, response[i].Altitude, 0)
+            val user =
+                com.example.hideandseek.data.datasource.local.LocationData(0, relativeTime.toString().substring(0, 8), response[i].Latitude, response[i].Longtitude, response[i].Altitude, 0)
             withContext(Dispatchers.IO) {
-                UserRepository(context).insert(user)
+                LocationRepository(context).insert(user)
             }
         }
     }
@@ -98,7 +96,7 @@ class MainActivityViewModel: ViewModel() {
                 val response = repository.getSpacetime(relativeTime.toString().substring(0, 8))
                 if (response.isSuccessful) {
                     Log.d("GETTEST", "${response}\n${response.body()}")
-                    response.body()?.let { insertAll(relativeTime, it, context) }
+                    response.body()?.let { insertLocationAll(relativeTime, it, context) }
                 } else {
                     Log.d("GETTEST", "$response")
                 }
@@ -108,8 +106,14 @@ class MainActivityViewModel: ViewModel() {
         }
     }
 
-    // Userデータベースのデータを全消去
-    fun deleteAll(context: Context) = viewModelScope.launch {
+    // Locationデータベースのデータを全消去
+    fun deleteAllLocation(context: Context) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            LocationRepository(context).deleteAll()
+        }
+    }
+
+    fun deleteAllUser(context: Context) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             UserRepository(context).deleteAll()
         }

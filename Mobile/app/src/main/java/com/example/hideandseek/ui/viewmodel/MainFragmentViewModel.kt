@@ -1,31 +1,31 @@
 package com.example.hideandseek.ui.viewmodel
 
-import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.hideandseek.data.datasource.local.User
-import com.example.hideandseek.data.datasource.local.UserRoomDatabase
-import com.example.hideandseek.data.datasource.remote.PostData
+import com.example.hideandseek.data.datasource.local.LocationData
+import com.example.hideandseek.data.datasource.local.UserDao
+import com.example.hideandseek.data.datasource.local.UserData
 import com.example.hideandseek.data.repository.ApiRepository
 import com.example.hideandseek.data.repository.MapRepository
+import com.example.hideandseek.data.repository.LocationRepository
 import com.example.hideandseek.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.IOException
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 class MainFragmentViewModel: ViewModel() {
-    lateinit var allUsersLive: LiveData<List<User>>
+    lateinit var allLocationsLive: LiveData<List<LocationData>>
+    lateinit var userLive: LiveData<List<UserData>>
+    lateinit var nowUser: UserData
     private val repository = ApiRepository.instance
 
-    fun setAllUsersLive(context: Context) {
-        allUsersLive = UserRepository(context).allUsers.asLiveData()
+    fun setAllLocationsLive(context: Context) {
+        allLocationsLive = LocationRepository(context).allLocations.asLiveData()
+    }
+
+    fun setUserLive(context: Context) {
+        userLive = UserRepository(context).allUsers.asLiveData()
     }
 
     private val _limitTime = MutableLiveData<String>()
@@ -137,39 +137,8 @@ class MainFragmentViewModel: ViewModel() {
         }
     }
 
-    fun setUpDemoList(locationArray: Array<Array<Array<Double?>>>, statusArray: Array<Array<Array<Int?>>>) {
-        // デモ用のリスト作成
-        for (i in 0..239) {
-            locationArray[i][0][0] = 41.84202707025747 + i*0.00001
-            locationArray[i][0][1] = 140.7673718711624 + i*0.00001
-            statusArray[i][0][0] = 0
-            statusArray[i][0][1] = 0
-            locationArray[i][1][0] = 41.84222707025747 + i*0.00001
-            locationArray[i][1][1] = 140.7673718711624 + i*0.00001
-            statusArray[i][1][0] = 0
-            statusArray[i][1][1] = 0
-            locationArray[i][2][0] = 41.84192707025747 + i*0.00001
-            locationArray[i][2][1] = 140.7674718711624 + i*0.00001
-            statusArray[i][2][0] = 1
-            statusArray[i][2][1] = 0
-            if (i > 60) {
-                locationArray[i][0][0] = 41.84202707025747 - i*0.000001
-                locationArray[i][0][1] = 140.7673718711624 - i*0.00001
-                statusArray[i][0][0] = 0
-                statusArray[i][0][1] = 0
-                locationArray[i][1][0] = 41.84222707025747 - i*0.000001
-                locationArray[i][1][1] = 140.7673718711624 - i*0.000015
-                statusArray[i][1][0] = 0
-                statusArray[i][1][1] = 1
-                locationArray[i][2][0] = 41.84192707025747 - i*0.000001
-                locationArray[i][2][1] = 140.7674718711624 - i*0.000015
-                statusArray[i][2][0] = 1
-                statusArray[i][2][1] = 0
-            }
-        }
-    }
-
     suspend fun fetchMap(url: String): Bitmap {
         return MapRepository().fetchMap(url)
     }
 }
+
