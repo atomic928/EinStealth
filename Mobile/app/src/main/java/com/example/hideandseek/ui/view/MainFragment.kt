@@ -228,6 +228,7 @@ class MainFragment: Fragment() {
 
         // 自分の情報の表示
         viewModel.userLive.observe(viewLifecycleOwner) {
+            Log.d("UserLive", it.toString())
             if (it.isNotEmpty()) {
                 viewModel.setLimitTime(it[0].relativeTime)
                 tvRelativeTime.text = it[it.size-1].relativeTime
@@ -346,12 +347,11 @@ class MainFragment: Fragment() {
 
         // skillボタンが押された時の処理
         btSkillOn.setOnClickListener {
+            // Userの最新情報から位置をとってきて、それを罠の位置とする
             viewModel.userLive.observe(viewLifecycleOwner) {
-                if (it.isNotEmpty()) {
-                    trapArray[trapNumber][0] = it[it.size-1].latitude
-                    trapArray[trapNumber][1] = it[it.size-1].longitude
-                    skillTime[trapNumber]    = it[it.size-1].relativeTime
-                }
+                trapArray[trapNumber][0] = it[it.size-1].latitude
+                trapArray[trapNumber][1] = it[it.size-1].longitude
+                skillTime[trapNumber]    = it[it.size-1].relativeTime
             }
             viewModel.setIsOverSkillTime(false)
             trapNumber += 1

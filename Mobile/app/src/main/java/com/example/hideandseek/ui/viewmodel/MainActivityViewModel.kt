@@ -107,9 +107,14 @@ class MainActivityViewModel: ViewModel() {
     }
 
     // Locationデータベースのデータを全消去
-    fun deleteAll(context: Context) = viewModelScope.launch {
+    fun deleteAllLocation(context: Context) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             LocationRepository(context).deleteAll()
+        }
+    }
+
+    fun deleteAllUser(context: Context) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
             UserRepository(context).deleteAll()
         }
     }

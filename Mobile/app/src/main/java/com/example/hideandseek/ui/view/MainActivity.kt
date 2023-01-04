@@ -99,6 +99,8 @@ class MainActivity : AppCompatActivity() {
                 if (location != null) {
                     // 相対時間の初期化
                     viewModel.setUpRelativeTime(LocalTime.now())
+                    // User情報の初期化はアプリの起動時にのみ行う
+                    viewModel.deleteAllUser(applicationContext)
                     postCalculatedRelativeTime(location)
                 }
             }
@@ -148,7 +150,7 @@ class MainActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     // Update UI elements
-                    viewModel.deleteAll(applicationContext)
+                    viewModel.deleteAllLocation(applicationContext)
                     viewModel.insertUser(it.relativeTime, location, applicationContext)
                     viewModel.postSpacetime(it.relativeTime, location)
                     viewModel.getSpacetime(it.relativeTime, applicationContext)

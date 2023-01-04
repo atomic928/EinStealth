@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 class MainFragmentViewModel: ViewModel() {
     lateinit var allLocationsLive: LiveData<List<LocationData>>
     lateinit var userLive: LiveData<List<UserData>>
+    lateinit var nowUser: UserData
     private val repository = ApiRepository.instance
 
     fun setAllLocationsLive(context: Context) {
@@ -140,3 +141,4 @@ class MainFragmentViewModel: ViewModel() {
         return MapRepository().fetchMap(url)
     }
 }
+
