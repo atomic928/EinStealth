@@ -21,32 +21,18 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-data class MainActivityUiState(
-    val relativeTime: LocalTime = LocalTime.MAX
-)
-
 class MainActivityViewModel: ViewModel() {
-    private val _uiState = MutableStateFlow(MainActivityUiState())
-    val uiState: StateFlow<MainActivityUiState> = _uiState.asStateFlow()
-
     private val repository = ApiRepository.instance
+
+    lateinit var relativeTime: LocalTime
 
     // relativeTimeの初期値（アプリを起動したときのLocalTime）をセットする
     fun setUpRelativeTime(nowTime: LocalTime) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                relativeTime = nowTime
-            )
-        }
+        relativeTime = nowTime
     }
 
     fun calculateRelativeTime(gap: Long) {
-        _uiState.update { currentState ->
-            Log.d("relativeTime", currentState.relativeTime.toString())
-            currentState.copy(
-                relativeTime = currentState.relativeTime.minusNanos(gap).plusSeconds(1)
-            )
-        }
+        relativeTime = relativeTime.minusNanos(gap)?.plusSeconds(1)!!
     }
 
     // 特殊相対性理論によりずれを計算する
