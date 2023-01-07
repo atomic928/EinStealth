@@ -146,16 +146,12 @@ class MainActivity : AppCompatActivity() {
         // 相対時間を計算
         viewModel.calculateRelativeTime(gap)
         // Roomに相対時間と座標を送る
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect {
-                    // Update UI elements
-                    viewModel.deleteAllLocation(applicationContext)
-                    viewModel.insertUser(it.relativeTime, location, applicationContext)
-                    viewModel.postSpacetime(it.relativeTime, location)
-                    viewModel.getSpacetime(it.relativeTime, applicationContext)
-                }
-            }
+        viewModel.insertUser(viewModel.relativeTime, location, applicationContext)
+        // 10秒おきにAPI通信をする
+        if (viewModel.relativeTime.second%10 == 0) {
+            viewModel.deleteAllLocation(applicationContext)
+            viewModel.postSpacetime(viewModel.relativeTime, location)
+            viewModel.getSpacetime(viewModel.relativeTime, applicationContext)
         }
     }
 

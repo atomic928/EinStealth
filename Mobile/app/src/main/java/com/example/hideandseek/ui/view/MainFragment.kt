@@ -349,6 +349,7 @@ class MainFragment: Fragment() {
         btSkillOn.setOnClickListener {
             // Userの最新情報から位置をとってきて、それを罠の位置とする
             viewModel.userLive.observe(viewLifecycleOwner) {
+                Log.d("TRAP", trapNumber.toString())
                 trapArray[trapNumber][0] = it[it.size-1].latitude
                 trapArray[trapNumber][1] = it[it.size-1].longitude
                 skillTime[trapNumber]    = it[it.size-1].relativeTime
