@@ -243,7 +243,7 @@ class MainFragment: Fragment() {
         viewModel.allLocationsLive.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
                 // URLから画像を取得
-                val iconUrlHide = "https://onl.tw/3n6JcpK"
+                val iconUrlHide = "https://bit.ly/3iiOi5R"
                 var url = "https://maps.googleapis.com/maps/api/staticmap" +
                         "?center=${it[it.size-1].latitude},${it[it.size-1].longitude}" +
                         "&size=310x640&scale=1" +
@@ -258,7 +258,7 @@ class MainFragment: Fragment() {
                 // trapの位置情報
                 if (trapNumber > 0) {
                     for (i in 0 until trapNumber) {
-                        url += "&markers=icon:https://onl.tw/CxjsiH1|${trapArray[i][0]},${trapArray[i][1]}"
+                        url += "&markers=icon:https://bit.ly/3ia0q9j|${trapArray[i][0]},${trapArray[i][1]}"
                     }
                     skillTime[trapNumber-1]?.let { it1 ->
                         viewModel.compareSkillTime(it[it.size-1].relativeTime,
