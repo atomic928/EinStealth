@@ -4,24 +4,31 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.hideandseek.data.datasource.local.LocationData
-import com.example.hideandseek.data.datasource.local.UserDao
-import com.example.hideandseek.data.datasource.local.UserData
-import com.example.hideandseek.data.repository.ApiRepository
-import com.example.hideandseek.data.repository.MapRepository
-import com.example.hideandseek.data.repository.LocationRepository
-import com.example.hideandseek.data.repository.UserRepository
+import com.example.hideandseek.data.datasource.local.*
+import com.example.hideandseek.data.repository.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainFragmentViewModel: ViewModel() {
     lateinit var allLocationsLive: LiveData<List<LocationData>>
+    lateinit var allTrapsLive: LiveData<List<TrapData>>
     lateinit var userLive: LiveData<List<UserData>>
     lateinit var nowUser: UserData
     private val repository = ApiRepository.instance
 
     fun setAllLocationsLive(context: Context) {
         allLocationsLive = LocationRepository(context).allLocations.asLiveData()
+    }
+
+    fun setAllTrapsLive(context: Context) {
+        allTrapsLive = TrapRepository(context).allTraps.asLiveData()
+    }
+
+    fun postTrapRoom(context: Context, trap: TrapData) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            TrapRepository(context).insert(trap)
+        }
     }
 
     fun setUserLive(context: Context) {
