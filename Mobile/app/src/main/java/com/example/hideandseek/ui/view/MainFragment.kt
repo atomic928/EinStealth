@@ -19,6 +19,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModel
@@ -224,6 +225,7 @@ class MainFragment: Fragment() {
         context?.let {
             viewModel.setAllLocationsLive(it)
             viewModel.setUserLive(it)
+            viewModel.setAllTrapsLive(it)
         }
 
         // 自分の情報の表示
@@ -237,6 +239,11 @@ class MainFragment: Fragment() {
                     viewModel.compareTime(it[it.size-1].relativeTime, limitTime)
                 }
             }
+        }
+
+        // Trap情報の監視
+        viewModel.allTrapsLive.observe(viewLifecycleOwner) {
+            Log.d("TRAP_LIVE", it.toString())
         }
 
         // データが更新されたら位置を表示
@@ -350,9 +357,12 @@ class MainFragment: Fragment() {
             // Userの最新情報から位置をとってきて、それを罠の位置とする
             viewModel.userLive.observe(viewLifecycleOwner) {
                 Log.d("TRAP", trapNumber.toString())
-                trapArray[trapNumber][0] = it[it.size-1].latitude
-                trapArray[trapNumber][1] = it[it.size-1].longitude
+//                trapArray[trapNumber][0] = it[it.size-1].latitude
+//                trapArray[trapNumber][1] = it[it.size-1].longitude
                 skillTime[trapNumber]    = it[it.size-1].relativeTime
+            }
+            context?.let {
+                viewModel.postTrapRoom(it)
             }
             viewModel.setIsOverSkillTime(false)
             trapNumber += 1

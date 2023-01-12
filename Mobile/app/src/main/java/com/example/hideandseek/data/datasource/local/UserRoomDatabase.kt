@@ -22,7 +22,7 @@ abstract class UserRoomDatabase: RoomDatabase(), ViewModelProvider.Factory {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
                         UserRoomDatabase::class.java,
-                        "user_db3"
+                        "user_db4"
                     )
                         .allowMainThreadQueries()
                         .build()

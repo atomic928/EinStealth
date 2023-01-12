@@ -9,5 +9,6 @@ data class UserData (
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "relativeTime") val relativeTime: String,
     @ColumnInfo(name = "latitude") val latitude: Double,
-    @ColumnInfo(name = "longitude") val longitude: Double
+    @ColumnInfo(name = "longitude") val longitude: Double,
+    @ColumnInfo(name = "altitude") val altitude: Double
 )

@@ -14,6 +14,9 @@ interface UserDao {
     @Delete
     fun delete(user: UserData)
 
+    @Query("SELECT * FROM user_table ORDER BY id DESC LIMIT 1")
+    fun getLatest(): UserData
+
     @Query("SELECT * FROM user_table")
     fun getAll(): Flow<List<UserData>>
 

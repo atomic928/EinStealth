@@ -12,6 +12,8 @@ class UserRepository (private val context: Context) {
 
     val allUsers: Flow<List<UserData>> = userDao.getAll()
 
+    val nowUser: UserData = userDao.getLatest()
+
     suspend fun insert(user: UserData) {
         userDao.insert(user)
     }

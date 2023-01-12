@@ -44,7 +44,7 @@ class MainActivityViewModel: ViewModel() {
     // ActivityからrelativeTimeとlocationを受け取り、Roomデータベースにuserデータとして送信
     fun insertUser(relativeTime: LocalTime, location: Location, context: Context) = viewModelScope.launch {
         val user =
-            com.example.hideandseek.data.datasource.local.UserData(0, relativeTime.toString().substring(0, 8), location.latitude, location.longitude)
+            com.example.hideandseek.data.datasource.local.UserData(0, relativeTime.toString().substring(0, 8), location.latitude, location.longitude, location.altitude)
         withContext(Dispatchers.IO) {
             UserRepository(context).insert(user)
         }
