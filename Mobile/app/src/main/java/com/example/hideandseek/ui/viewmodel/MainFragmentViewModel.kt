@@ -14,7 +14,6 @@ class MainFragmentViewModel: ViewModel() {
     lateinit var allLocationsLive: LiveData<List<LocationData>>
     lateinit var allTrapsLive: LiveData<List<TrapData>>
     lateinit var userLive: LiveData<List<UserData>>
-    lateinit var nowUser: LiveData<UserData>
     private val repository = ApiRepository.instance
 
     fun setAllLocationsLive(context: Context) {
@@ -28,10 +27,9 @@ class MainFragmentViewModel: ViewModel() {
     fun postTrapRoom(context: Context) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             Log.d("USER_TRAP", UserRepository(context).nowUser.toString())
-//            val trap = userLive.value?.get(userLive.value!!.size)?.let { TrapData(0, it.latitude, it.longitude, it.altitude, 0) }
-//            if (trap != null) {
-//                TrapRepository(context).insert(trap)
-//            }
+            val nowUser = UserRepository(context).nowUser
+            val trap = TrapData(0, nowUser.latitude, nowUser.longitude, nowUser.altitude, 0)
+            TrapRepository(context).insert(trap)
         }
     }
 

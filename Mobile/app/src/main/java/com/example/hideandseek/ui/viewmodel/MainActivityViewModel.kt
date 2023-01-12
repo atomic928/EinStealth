@@ -8,6 +8,7 @@ import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.datasource.remote.ResponseData
 import com.example.hideandseek.data.repository.ApiRepository
 import com.example.hideandseek.data.repository.LocationRepository
+import com.example.hideandseek.data.repository.TrapRepository
 import com.example.hideandseek.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -102,6 +103,12 @@ class MainActivityViewModel: ViewModel() {
     fun deleteAllUser(context: Context) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             UserRepository(context).deleteAll()
+        }
+    }
+
+    fun deleteAllTrap(context: Context) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            TrapRepository(context).deleteAll()
         }
     }
 }

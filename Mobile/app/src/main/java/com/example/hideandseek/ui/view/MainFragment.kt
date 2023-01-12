@@ -263,10 +263,16 @@ class MainFragment: Fragment() {
                 }
 
                 // trapの位置情報
-                if (trapNumber > 0) {
-                    for (i in 0 until trapNumber) {
-                        url += "&markers=icon:https://bit.ly/3ia0q9j|${trapArray[i][0]},${trapArray[i][1]}"
+                viewModel.allTrapsLive.observe(viewLifecycleOwner) { allTrap ->
+                    if (allTrap.isNotEmpty()) {
+                        for (i in allTrap.indices) {
+                            url += "&markers=icon:https://bit.ly/3ia0q9j|${allTrap[i].latitude},${allTrap[i].longitude}"
+                        }
                     }
+                }
+
+                // Skill Buttonの Progress Bar
+                if (trapNumber > 0) {
                     skillTime[trapNumber-1]?.let { it1 ->
                         viewModel.compareSkillTime(it[it.size-1].relativeTime,
                             it1
@@ -357,8 +363,6 @@ class MainFragment: Fragment() {
             // Userの最新情報から位置をとってきて、それを罠の位置とする
             viewModel.userLive.observe(viewLifecycleOwner) {
                 Log.d("TRAP", trapNumber.toString())
-//                trapArray[trapNumber][0] = it[it.size-1].latitude
-//                trapArray[trapNumber][1] = it[it.size-1].longitude
                 skillTime[trapNumber]    = it[it.size-1].relativeTime
             }
             context?.let {

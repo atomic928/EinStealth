@@ -101,6 +101,7 @@ class MainActivity : AppCompatActivity() {
                     viewModel.setUpRelativeTime(LocalTime.now())
                     // User情報の初期化はアプリの起動時にのみ行う
                     viewModel.deleteAllUser(applicationContext)
+                    viewModel.deleteAllTrap(applicationContext)
                     postCalculatedRelativeTime(location)
                 }
             }
