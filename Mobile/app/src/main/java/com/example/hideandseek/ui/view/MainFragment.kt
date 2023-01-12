@@ -248,6 +248,7 @@ class MainFragment: Fragment() {
 
         // データが更新されたら位置を表示
         viewModel.allLocationsLive.observe(viewLifecycleOwner) {
+            Log.d("ALL_Location", it.toString())
             if (it.isNotEmpty()) {
                 // URLから画像を取得
                 val iconUrlHide = "https://bit.ly/3iiOi5R"
@@ -259,7 +260,11 @@ class MainFragment: Fragment() {
 
                 // ユーザーの位置情報
                 for (i in it.indices) {
-                    url += "&markers=icon:" + iconUrlHide + "|${it[i].latitude},${it[i].longitude}"
+                    if (it[i].objId == 1) {
+                        context?.let { it1 -> viewModel.postTrapRoom(it1) }
+                    } else {
+                        url += "&markers=icon:" + iconUrlHide + "|${it[i].latitude},${it[i].longitude}"
+                    }
                 }
 
                 // trapの位置情報
@@ -367,6 +372,7 @@ class MainFragment: Fragment() {
             }
             context?.let {
                 viewModel.postTrapRoom(it)
+                viewModel.postTrapSpacetime(it)
             }
             viewModel.setIsOverSkillTime(false)
             trapNumber += 1

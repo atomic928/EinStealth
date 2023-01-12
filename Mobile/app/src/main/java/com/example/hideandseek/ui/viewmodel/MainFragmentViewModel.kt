@@ -33,7 +33,6 @@ class MainFragmentViewModel: ViewModel() {
             val nowUser = UserRepository(context).nowUser
             val trap = TrapData(0, nowUser.latitude, nowUser.longitude, nowUser.altitude, 0)
             TrapRepository(context).insert(trap)
-            postTrapSpacetime(nowUser.relativeTime, nowUser.latitude, nowUser.longitude, nowUser.altitude)
         }
     }
 
@@ -150,10 +149,11 @@ class MainFragmentViewModel: ViewModel() {
         }
     }
 
-    private fun postTrapSpacetime(relativeTime: String, latitude: Double, longitude: Double, altitude: Double) {
+    fun postTrapSpacetime(context: Context) {
+        val nowUser = UserRepository(context).nowUser
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val request = PostData.PostSpacetime(relativeTime.substring(0, 7)+ "0", latitude, longitude, altitude, 1)
+                val request = PostData.PostSpacetime(nowUser.relativeTime.substring(0, 7)+ "0", nowUser.latitude, nowUser.longitude, nowUser.altitude, 1)
                 val response = repository.postSpacetime(request)
                 if (response.isSuccessful) {
                     Log.d("POSTTEST", "${response}\n${response.body()}")
