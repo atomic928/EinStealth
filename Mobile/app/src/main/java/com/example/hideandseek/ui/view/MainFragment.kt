@@ -261,7 +261,7 @@ class MainFragment: Fragment() {
                 // ユーザーの位置情報
                 for (i in it.indices) {
                     if (it[i].objId == 1) {
-                        context?.let { it1 -> viewModel.postTrapRoom(it1) }
+                        context?.let { it1 -> viewModel.postTrapRoom(it1, 1) }
                     } else {
                         url += "&markers=icon:" + iconUrlHide + "|${it[i].latitude},${it[i].longitude}"
                     }
@@ -271,7 +271,9 @@ class MainFragment: Fragment() {
                 viewModel.allTrapsLive.observe(viewLifecycleOwner) { allTrap ->
                     if (allTrap.isNotEmpty()) {
                         for (i in allTrap.indices) {
-                            url += "&markers=icon:https://bit.ly/3ia0q9j|${allTrap[i].latitude},${allTrap[i].longitude}"
+                            if (allTrap[i].objId == 0) {
+                                url += "&markers=icon:https://bit.ly/3ia0q9j|${allTrap[i].latitude},${allTrap[i].longitude}"
+                            }
                         }
                     }
                 }
@@ -371,7 +373,7 @@ class MainFragment: Fragment() {
                 skillTime[trapNumber]    = it[it.size-1].relativeTime
             }
             context?.let {
-                viewModel.postTrapRoom(it)
+                viewModel.postTrapRoom(it, 0)
                 viewModel.postTrapSpacetime(it)
             }
             viewModel.setIsOverSkillTime(false)

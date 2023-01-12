@@ -27,11 +27,11 @@ class MainFragmentViewModel: ViewModel() {
         allTrapsLive = TrapRepository(context).allTraps.asLiveData()
     }
 
-    fun postTrapRoom(context: Context) = viewModelScope.launch {
+    fun postTrapRoom(context: Context, isMine: Int) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             Log.d("USER_TRAP", UserRepository(context).nowUser.toString())
             val nowUser = UserRepository(context).nowUser
-            val trap = TrapData(0, nowUser.latitude, nowUser.longitude, nowUser.altitude, 0)
+            val trap = TrapData(0, nowUser.latitude, nowUser.longitude, nowUser.altitude, isMine)
             TrapRepository(context).insert(trap)
         }
     }
