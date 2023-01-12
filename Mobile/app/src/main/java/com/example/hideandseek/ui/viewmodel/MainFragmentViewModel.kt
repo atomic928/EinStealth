@@ -2,13 +2,16 @@ package com.example.hideandseek.ui.viewmodel
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.*
+import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.repository.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalTime
 
 class MainFragmentViewModel: ViewModel() {
     lateinit var allLocationsLive: LiveData<List<LocationData>>
@@ -30,6 +33,7 @@ class MainFragmentViewModel: ViewModel() {
             val nowUser = UserRepository(context).nowUser
             val trap = TrapData(0, nowUser.latitude, nowUser.longitude, nowUser.altitude, 0)
             TrapRepository(context).insert(trap)
+            postTrapSpacetime(nowUser.relativeTime, nowUser.latitude, nowUser.longitude, nowUser.altitude)
         }
     }
 
@@ -142,6 +146,22 @@ class MainFragmentViewModel: ViewModel() {
                 }
             } catch (e: java.lang.Exception){
                 Log.d("GETTEST", "$e")
+            }
+        }
+    }
+
+    private fun postTrapSpacetime(relativeTime: String, latitude: Double, longitude: Double, altitude: Double) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val request = PostData.PostSpacetime(relativeTime.substring(0, 7)+ "0", latitude, longitude, altitude, 1)
+                val response = repository.postSpacetime(request)
+                if (response.isSuccessful) {
+                    Log.d("POSTTEST", "${response}\n${response.body()}")
+                } else {
+                    Log.d("POSTTEST", "$response")
+                }
+            } catch (e: java.lang.Exception){
+                Log.d("POSTTEST", "$e")
             }
         }
     }
