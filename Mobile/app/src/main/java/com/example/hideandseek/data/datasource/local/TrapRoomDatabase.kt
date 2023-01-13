@@ -6,23 +6,23 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [UserData::class], version = 1, exportSchema = false)
-abstract class UserRoomDatabase: RoomDatabase(), ViewModelProvider.Factory {
+@Database(entities = [TrapData::class], version = 1, exportSchema = false)
+abstract class TrapRoomDatabase: RoomDatabase(), ViewModelProvider.Factory {
 
-    abstract fun userDao() : UserDao
+    abstract fun trapDao() : TrapDao
 
     companion object {
-        private var INSTANCE: UserRoomDatabase? = null
+        private var INSTANCE: TrapRoomDatabase? = null
 
         private val lock = Any()
 
-        fun getInstance(context: Context): UserRoomDatabase {
+        fun getInstance(context: Context): TrapRoomDatabase {
             synchronized(lock) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
-                        UserRoomDatabase::class.java,
-                        "user_db4"
+                        TrapRoomDatabase::class.java,
+                        "trap_db"
                     )
                         .allowMainThreadQueries()
                         .build()

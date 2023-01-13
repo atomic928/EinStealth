@@ -8,6 +8,7 @@ import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.datasource.remote.ResponseData
 import com.example.hideandseek.data.repository.ApiRepository
 import com.example.hideandseek.data.repository.LocationRepository
+import com.example.hideandseek.data.repository.TrapRepository
 import com.example.hideandseek.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +45,7 @@ class MainActivityViewModel: ViewModel() {
     // ActivityからrelativeTimeとlocationを受け取り、Roomデータベースにuserデータとして送信
     fun insertUser(relativeTime: LocalTime, location: Location, context: Context) = viewModelScope.launch {
         val user =
-            com.example.hideandseek.data.datasource.local.UserData(0, relativeTime.toString().substring(0, 8), location.latitude, location.longitude)
+            com.example.hideandseek.data.datasource.local.UserData(0, relativeTime.toString().substring(0, 8), location.latitude, location.longitude, location.altitude)
         withContext(Dispatchers.IO) {
             UserRepository(context).insert(user)
         }
@@ -53,7 +54,7 @@ class MainActivityViewModel: ViewModel() {
     private fun insertLocationAll(relativeTime: LocalTime, response: List<ResponseData.ResponseGetSpacetime>, context: Context) = viewModelScope.launch {
         for (i in response.indices) {
             val user =
-                com.example.hideandseek.data.datasource.local.LocationData(0, relativeTime.toString().substring(0, 8), response[i].Latitude, response[i].Longtitude, response[i].Altitude, 0)
+                com.example.hideandseek.data.datasource.local.LocationData(0, relativeTime.toString().substring(0, 8), response[i].Latitude, response[i].Longtitude, response[i].Altitude, response[i].ObjId)
             withContext(Dispatchers.IO) {
                 LocationRepository(context).insert(user)
             }
@@ -102,6 +103,12 @@ class MainActivityViewModel: ViewModel() {
     fun deleteAllUser(context: Context) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             UserRepository(context).deleteAll()
+        }
+    }
+
+    fun deleteAllTrap(context: Context) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            TrapRepository(context).deleteAll()
         }
     }
 }

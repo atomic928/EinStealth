@@ -19,6 +19,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModel
@@ -224,6 +225,7 @@ class MainFragment: Fragment() {
         context?.let {
             viewModel.setAllLocationsLive(it)
             viewModel.setUserLive(it)
+            viewModel.setAllTrapsLive(it)
         }
 
         // 自分の情報の表示
@@ -239,8 +241,14 @@ class MainFragment: Fragment() {
             }
         }
 
+        // Trap情報の監視
+        viewModel.allTrapsLive.observe(viewLifecycleOwner) {
+            Log.d("TRAP_LIVE", it.toString())
+        }
+
         // データが更新されたら位置を表示
         viewModel.allLocationsLive.observe(viewLifecycleOwner) {
+            Log.d("ALL_Location", it.toString())
             if (it.isNotEmpty()) {
                 // URLから画像を取得
                 val iconUrlHide = "https://bit.ly/3iiOi5R"
@@ -252,14 +260,26 @@ class MainFragment: Fragment() {
 
                 // ユーザーの位置情報
                 for (i in it.indices) {
-                    url += "&markers=icon:" + iconUrlHide + "|${it[i].latitude},${it[i].longitude}"
+                    if (it[i].objId == 1) {
+                        context?.let { it1 -> viewModel.postTrapRoom(it1, 1) }
+                    } else {
+                        url += "&markers=icon:" + iconUrlHide + "|${it[i].latitude},${it[i].longitude}"
+                    }
                 }
 
                 // trapの位置情報
-                if (trapNumber > 0) {
-                    for (i in 0 until trapNumber) {
-                        url += "&markers=icon:https://bit.ly/3ia0q9j|${trapArray[i][0]},${trapArray[i][1]}"
+                viewModel.allTrapsLive.observe(viewLifecycleOwner) { allTrap ->
+                    if (allTrap.isNotEmpty()) {
+                        for (i in allTrap.indices) {
+                            if (allTrap[i].objId == 0) {
+                                url += "&markers=icon:https://bit.ly/3ia0q9j|${allTrap[i].latitude},${allTrap[i].longitude}"
+                            }
+                        }
                     }
+                }
+
+                // Skill Buttonの Progress Bar
+                if (trapNumber > 0) {
                     skillTime[trapNumber-1]?.let { it1 ->
                         viewModel.compareSkillTime(it[it.size-1].relativeTime,
                             it1
@@ -350,9 +370,11 @@ class MainFragment: Fragment() {
             // Userの最新情報から位置をとってきて、それを罠の位置とする
             viewModel.userLive.observe(viewLifecycleOwner) {
                 Log.d("TRAP", trapNumber.toString())
-                trapArray[trapNumber][0] = it[it.size-1].latitude
-                trapArray[trapNumber][1] = it[it.size-1].longitude
                 skillTime[trapNumber]    = it[it.size-1].relativeTime
+            }
+            context?.let {
+                viewModel.postTrapRoom(it, 0)
+                viewModel.postTrapSpacetime(it)
             }
             viewModel.setIsOverSkillTime(false)
             trapNumber += 1
