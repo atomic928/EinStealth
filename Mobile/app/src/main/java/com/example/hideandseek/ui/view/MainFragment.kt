@@ -287,9 +287,13 @@ class MainFragment: Fragment() {
                 }
 
                 // URLから画像を取得
-                coroutineScope.launch {
-                    val originalBitmap = viewModel.fetchMap(url)
-                    viewModel.setMap(originalBitmap)
+                // 相対時間10秒おきに行う
+                if (userLive[userLive.size-1].relativeTime.substring(7, 8) == "0") {
+                    Log.d("fetchMAP", "Mapが更新されました")
+                    coroutineScope.launch {
+                        val originalBitmap = viewModel.fetchMap(url)
+                        viewModel.setMap(originalBitmap)
+                    }
                 }
             }
         }
