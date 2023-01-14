@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalTime
+import kotlin.math.abs
 
 class MainFragmentViewModel: ViewModel() {
     lateinit var allLocationsLive: LiveData<List<LocationData>>
@@ -83,6 +84,12 @@ class MainFragmentViewModel: ViewModel() {
         if (relativeTime.substring(6, 7) == skillTime.substring(6, 7)) {
             _isOverSkillTime.value = relativeTime.substring(3, 5).toInt() > skillTime.substring(3, 5).toInt()
         }
+    }
+
+    fun checkCaughtTrap(user: UserData, trap: TrapData): Boolean {
+        // UserがTrapと一定の距離に来たかどうかを返す
+        Log.d("checkCaughtTrap", (abs(user.latitude-trap.latitude) + abs(user.longitude-trap.longitude)).toString())
+        return abs(user.latitude-trap.latitude) < 0.0001 && abs(user.longitude-trap.longitude) < 0.0001
     }
 
     fun howProgressSkillTime(relativeTime: String, skillTime: String): Int {
