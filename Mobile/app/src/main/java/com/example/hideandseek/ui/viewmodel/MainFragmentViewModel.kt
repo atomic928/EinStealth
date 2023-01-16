@@ -37,6 +37,14 @@ class MainFragmentViewModel: ViewModel() {
         }
     }
 
+    private val _skillTime = MutableLiveData<String>()
+    val skillTime: LiveData<String> = _skillTime
+
+    fun setSkillTime(context: Context) {
+        val nowUser = UserRepository(context).nowUser
+        _skillTime.value = nowUser.relativeTime
+    }
+
     fun setUserLive(context: Context) {
         userLive = UserRepository(context).allUsers.asLiveData()
     }
@@ -81,8 +89,9 @@ class MainFragmentViewModel: ViewModel() {
     val isOverSkillTime: LiveData<Boolean> = _isOverSkillTime
 
     fun compareSkillTime(relativeTime: String, skillTime: String) {
-        if (relativeTime.substring(6, 7) == skillTime.substring(6, 7)) {
-            _isOverSkillTime.value = relativeTime.substring(3, 5).toInt() > skillTime.substring(3, 5).toInt()
+        Log.d("CompareSkillTime", "relative: $relativeTime, skill: $skillTime")
+        if (relativeTime.substring(6, 8) == skillTime.substring(6, 8)) {
+            _isOverSkillTime.value = relativeTime != skillTime
         }
     }
 
@@ -101,6 +110,7 @@ class MainFragmentViewModel: ViewModel() {
     }
 
     fun howProgressSkillTime(relativeTime: String, skillTime: String): Int {
+        Log.d("HowProgress", ((60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60).toString())
         if (relativeTime.substring(6).toInt() < skillTime.substring(6).toInt()) {
             return (60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60
         } else {
