@@ -136,11 +136,43 @@ class MainFragment: Fragment() {
         val user4Demon:       ImageView = binding.user4Demon
         // User captured
         val user1Captured:    ImageView = binding.user1Captured
+
         // 罠にかかったとき
-        val ivEye:            ImageView = binding.ivEye
-        val tvTrap:           TextView  = binding.tvTrap
-        val trapDialogText:   ImageView = binding.textOniTrap
-        val trapDialogDemon:  ImageView = binding.ivOniTrap
+        val mapHide:          ImageView   = binding.ivHideMap
+        val ivEye:            ImageView   = binding.ivEye
+        val tvTrap:           TextView    = binding.tvTrap
+        val trapDialogText:   ImageView   = binding.textOniTrap
+        val trapDialogDemon:  ImageView   = binding.ivOniTrap
+        val progressTrap:     ProgressBar = binding.progressTrap
+
+        // 罠に掛かると、このダイアログが最初に出るようにしたい
+        // できればアニメーションつけたいけど、むずいので一旦放置
+        fun changeTrapDialog(isOn: Boolean) {
+            if (isOn) {
+                trapDialogText.visibility  = View.VISIBLE
+                trapDialogDemon.visibility = View.VISIBLE
+            } else {
+                trapDialogText.visibility  = View.INVISIBLE
+                trapDialogDemon.visibility = View.INVISIBLE
+            }
+        }
+
+        fun changeIsCapturedInTrapVisible(isOn: Boolean) {
+            if (isOn) {
+                mapHide.visibility         = View.INVISIBLE
+                ivEye.visibility           = View.INVISIBLE
+                tvTrap.visibility          = View.INVISIBLE
+                progressTrap.visibility    = View.INVISIBLE
+            } else {
+                mapHide.visibility         = View.VISIBLE
+                ivEye.visibility           = View.VISIBLE
+                tvTrap.visibility          = View.VISIBLE
+                progressTrap.visibility    = View.VISIBLE
+
+                progressTrap.max = 60
+            }
+        }
+
         // クリアしたとき
         val dialogClear:      ImageView = binding.dialogClear
         val dialogClearUser1: ImageView = binding.dialogClearUser1
@@ -258,9 +290,18 @@ class MainFragment: Fragment() {
                             if (allTrap[i].objId == 0) {
                                 url += "&markers=icon:https://onl.bz/FetpS7Y|${allTrap[i].latitude},${allTrap[i].longitude}"
                             }
-                            viewModel.checkCaughtTrap(userLive[userLive.size-1], allTrap[i])
+                            if (viewModel.checkCaughtTrap(userLive[userLive.size-1], allTrap[i])) {
+                                context?.let { viewModel.setTrapTime(it) }
+                            }
                         }
                     }
+                }
+
+                // trapにかかっている時間を計測
+                viewModel.trapTime.observe(viewLifecycleOwner) { trapTime ->
+                    viewModel.compareTrapTime(userLive[userLive.size-1].relativeTime, trapTime)
+                    val howProgressTrap = viewModel.howProgressTrapTime(userLive[userLive.size-1].relativeTime, trapTime)
+                    progressTrap.progress = howProgressTrap
                 }
 
                 // Skill Buttonの Progress Bar
@@ -378,7 +419,9 @@ class MainFragment: Fragment() {
             changeBtSkillVisible(it)
         }
 
-
+        viewModel.isOverTrapTime.observe(viewLifecycleOwner) {
+            changeIsCapturedInTrapVisible(it)
+        }
 
         // Mapに画像をセット
         viewModel.map.observe(viewLifecycleOwner) {
