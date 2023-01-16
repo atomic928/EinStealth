@@ -33,18 +33,6 @@ class MainFragment: Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val viewModel: MainFragmentViewModel by viewModels()
 
-    private val statusArray = Array(240) {
-        Array(3) {
-            arrayOfNulls<Int>(2)
-        }
-    }
-
-    private val trapArray = Array(10) {
-        arrayOfNulls<Double>(2)
-    }
-
-    private val skillTime = arrayOfNulls<String>(10)
-
     private var trapNumber = 0
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -275,13 +263,16 @@ class MainFragment: Fragment() {
                 }
 
                 // Skill Buttonの Progress Bar
+                // スキルボタンを複数回押したとき、relativeが一旦最初の(skillTime+1)秒になって、本来のrelativeまで1秒ずつ足される
+                // observeを二重にしてるせいで変な挙動していると思われる（放置するとメモリやばそう）
+                // この辺ちゃんと仕様わかってないので、リファクタリング時に修正する
                 if (trapNumber > 0) {
-                    skillTime[trapNumber-1]?.let { it1 ->
+                    viewModel.skillTime.observe(viewLifecycleOwner) { skillTime ->
                         viewModel.compareSkillTime(userLive[userLive.size-1].relativeTime,
-                            it1
+                            skillTime
                         )
                         progressSkill.progress = viewModel.howProgressSkillTime(userLive[userLive.size-1].relativeTime,
-                            it1
+                            skillTime
                         )
                     }
                 }
@@ -369,13 +360,10 @@ class MainFragment: Fragment() {
         // skillボタンが押された時の処理
         btSkillOn.setOnClickListener {
             // Userの最新情報から位置をとってきて、それを罠の位置とする
-            viewModel.userLive.observe(viewLifecycleOwner) {
-                Log.d("TRAP", trapNumber.toString())
-                skillTime[trapNumber]    = it[it.size-1].relativeTime
-            }
             context?.let {
                 viewModel.postTrapRoom(it, 0)
                 viewModel.postTrapSpacetime(it)
+                viewModel.setSkillTime(it)
             }
             viewModel.setIsOverSkillTime(false)
             trapNumber += 1
