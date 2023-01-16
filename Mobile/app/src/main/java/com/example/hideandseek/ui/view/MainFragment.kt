@@ -33,18 +33,6 @@ class MainFragment: Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val viewModel: MainFragmentViewModel by viewModels()
 
-    private val statusArray = Array(240) {
-        Array(3) {
-            arrayOfNulls<Int>(2)
-        }
-    }
-
-    private val trapArray = Array(10) {
-        arrayOfNulls<Double>(2)
-    }
-
-    private val skillTime = arrayOfNulls<String>(10)
-
     private var trapNumber = 0
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -229,41 +217,37 @@ class MainFragment: Fragment() {
         }
 
         // 自分の情報の表示
-        viewModel.userLive.observe(viewLifecycleOwner) {
-            Log.d("UserLive", it.toString())
-            if (it.isNotEmpty()) {
-                viewModel.setLimitTime(it[0].relativeTime)
-                tvRelativeTime.text = it[it.size-1].relativeTime
+        viewModel.userLive.observe(viewLifecycleOwner) { userLive ->
+            Log.d("UserLive", userLive.toString())
+            if (userLive.isNotEmpty()) {
+                viewModel.setLimitTime(userLive[0].relativeTime)
+                tvRelativeTime.text = userLive[userLive.size-1].relativeTime
                 // 制限時間になったかどうかの判定
                 viewModel.limitTime.observe(viewLifecycleOwner) { limitTime ->
-                    viewModel.compareTime(it[it.size-1].relativeTime, limitTime)
+                    viewModel.compareTime(userLive[userLive.size-1].relativeTime, limitTime)
                 }
-            }
-        }
 
-        // Trap情報の監視
-        viewModel.allTrapsLive.observe(viewLifecycleOwner) {
-            Log.d("TRAP_LIVE", it.toString())
-        }
-
-        // データが更新されたら位置を表示
-        viewModel.allLocationsLive.observe(viewLifecycleOwner) {
-            Log.d("ALL_Location", it.toString())
-            if (it.isNotEmpty()) {
-                // URLから画像を取得
-                val iconUrlHide = "https://bit.ly/3iiOi5R"
+                // 自分の位置情報のurl
+                val iconUrlHide = "https://onl.bz/dcMZVEa"
                 var url = "https://maps.googleapis.com/maps/api/staticmap" +
-                        "?center=${it[it.size-1].latitude},${it[it.size-1].longitude}" +
+                        "?center=${userLive[userLive.size-1].latitude},${userLive[userLive.size-1].longitude}" +
                         "&size=310x640&scale=1" +
                         "&zoom=18" +
-                        "&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ"
+                        "&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ" +
+                        "&markers=icon:" + iconUrlHide + "|${userLive[userLive.size-1].latitude},${userLive[userLive.size-1].longitude}"
 
-                // ユーザーの位置情報
-                for (i in it.indices) {
-                    if (it[i].objId == 1) {
-                        context?.let { it1 -> viewModel.postTrapRoom(it1, 1) }
-                    } else {
-                        url += "&markers=icon:" + iconUrlHide + "|${it[i].latitude},${it[i].longitude}"
+                // 他人の位置を追加
+                viewModel.allLocationsLive.observe(viewLifecycleOwner) { allLocationLive ->
+                    Log.d("ALL_Location", allLocationLive.toString())
+                    if (allLocationLive.isNotEmpty()) {
+                        // ユーザーの位置情報
+                        for (i in allLocationLive.indices) {
+                            if (allLocationLive[i].objId == 1) {
+                                context?.let { context -> viewModel.postTrapRoom(context, 1) }
+                            } else {
+                                url += "&markers=icon:" + iconUrlHide + "|${allLocationLive[i].latitude},${allLocationLive[i].longitude}"
+                            }
+                        }
                     }
                 }
 
@@ -272,20 +256,23 @@ class MainFragment: Fragment() {
                     if (allTrap.isNotEmpty()) {
                         for (i in allTrap.indices) {
                             if (allTrap[i].objId == 0) {
-                                url += "&markers=icon:https://bit.ly/3ia0q9j|${allTrap[i].latitude},${allTrap[i].longitude}"
+                                url += "&markers=icon:https://onl.bz/FetpS7Y|${allTrap[i].latitude},${allTrap[i].longitude}"
                             }
                         }
                     }
                 }
 
                 // Skill Buttonの Progress Bar
+                // スキルボタンを複数回押したとき、relativeが一旦最初の(skillTime+1)秒になって、本来のrelativeまで1秒ずつ足される
+                // observeを二重にしてるせいで変な挙動していると思われる（放置するとメモリやばそう）
+                // この辺ちゃんと仕様わかってないので、リファクタリング時に修正する
                 if (trapNumber > 0) {
-                    skillTime[trapNumber-1]?.let { it1 ->
-                        viewModel.compareSkillTime(it[it.size-1].relativeTime,
-                            it1
+                    viewModel.skillTime.observe(viewLifecycleOwner) { skillTime ->
+                        viewModel.compareSkillTime(userLive[userLive.size-1].relativeTime,
+                            skillTime
                         )
-                        progressSkill.progress = viewModel.howProgressSkillTime(it[it.size-1].relativeTime,
-                            it1
+                        progressSkill.progress = viewModel.howProgressSkillTime(userLive[userLive.size-1].relativeTime,
+                            skillTime
                         )
                     }
                 }
@@ -296,6 +283,11 @@ class MainFragment: Fragment() {
                     viewModel.setMap(originalBitmap)
                 }
             }
+        }
+
+        // Trap情報の監視
+        viewModel.allTrapsLive.observe(viewLifecycleOwner) {
+            Log.d("TRAP_LIVE", it.toString())
         }
 
         viewModel.limitTime.observe(viewLifecycleOwner) {
@@ -368,13 +360,10 @@ class MainFragment: Fragment() {
         // skillボタンが押された時の処理
         btSkillOn.setOnClickListener {
             // Userの最新情報から位置をとってきて、それを罠の位置とする
-            viewModel.userLive.observe(viewLifecycleOwner) {
-                Log.d("TRAP", trapNumber.toString())
-                skillTime[trapNumber]    = it[it.size-1].relativeTime
-            }
             context?.let {
                 viewModel.postTrapRoom(it, 0)
                 viewModel.postTrapSpacetime(it)
+                viewModel.setSkillTime(it)
             }
             viewModel.setIsOverSkillTime(false)
             trapNumber += 1
