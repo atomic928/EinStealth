@@ -93,19 +93,6 @@ class MainFragment: Fragment() {
             }
         }
 
-        // 捕まったか確認するダイアログ
-        val dialogCapture:    ImageView = binding.dialogCapture
-        val ivDemonCapture:   ImageView = binding.dialogCaptureDemon
-        val btCaptureYes:     ImageView = binding.btCaptureYes
-        val btCaptureNo:      ImageView = binding.btCaptureNo
-
-        fun changeCaptureDialogVisible(visibility: Int) {
-            dialogCapture.visibility  = visibility
-            ivDemonCapture.visibility = visibility
-            btCaptureYes.visibility   = visibility
-            btCaptureNo.visibility    = visibility
-        }
-
         // 捕まった後のダイアログ
         val dialogCaptured:   ImageView = binding.dialogCaptured
         val ivDemonCaptured:  ImageView = binding.dialogCapturedDemon
@@ -189,11 +176,6 @@ class MainFragment: Fragment() {
             btSkillOn.visibility      = visibility
             btSkillOff.visibility     = visibility
             progressSkill.visibility  = visibility
-
-            dialogCapture.visibility  = visibility
-            ivDemonCapture.visibility = visibility
-            btCaptureYes.visibility   = visibility
-            btCaptureNo.visibility    = visibility
 
             btCaptureOn.visibility      = visibility
             btCaptureOff.visibility     = visibility
@@ -303,20 +285,10 @@ class MainFragment: Fragment() {
         viewModel.isOverLimitTime.observe(viewLifecycleOwner) {
             if (it) {
                 // クリアダイアログを表示
-                changeClearDialogVisible(View.VISIBLE)
+                val successEscapeDialogFragment = SuccessEscapeDialogFragment()
+                val supportFragmentManager = childFragmentManager
+                successEscapeDialogFragment.show(supportFragmentManager, "clear")
             }
-        }
-
-        // クリアダイアログの閉じるを押した時
-        btClearClose.setOnClickListener {
-            // クリアダイアログを非表示
-            changeClearDialogVisible(View.INVISIBLE)
-
-            // Resultダイアログの表示
-            changeResultDialogVisible(View.VISIBLE)
-
-            // Result以外のものを非表示
-            changeOtherResultDialog(View.INVISIBLE)
         }
 
         // Resultダイアログの閉じるを押した時の処理
@@ -330,25 +302,9 @@ class MainFragment: Fragment() {
 
         // 捕まったボタンが押された時の処理
         btCaptureOn.setOnClickListener {
-            // ボタンを押された状態にする
-            changeBtCaptureVisible(false)
-            // 捕まったか確認するダイアログが出現
-            changeCaptureDialogVisible(View.VISIBLE)
-        }
-
-        btCaptureNo.setOnClickListener {
-            // ボタンを押されていない状態にする
-            changeBtCaptureVisible(true)
-            // 捕まったか確認するダイアログが消える
-            changeCaptureDialogVisible(View.INVISIBLE)
-        }
-
-        btCaptureYes.setOnClickListener {
-            // 捕まったか確認するダイアログが消える
-            changeCaptureDialogVisible(View.INVISIBLE)
-
-            // 捕まったダイアログが出る
-            changeAfterCaptureDialogVisible(View.VISIBLE)
+            val captureDialogFragment = CaptureDialogFragment()
+            val supportFragmentManager = childFragmentManager
+            captureDialogFragment.show(supportFragmentManager, "capture")
         }
 
         btCapturedClose.setOnClickListener {
