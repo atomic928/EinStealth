@@ -127,7 +127,9 @@ class BeTrappedFragment: Fragment() {
 
         // 捕まったボタンが押された時の処理
         btCaptureOn.setOnClickListener {
-            // TODO: 捕まったダイアログを表示
+            val captureDialogFragment = CaptureDialogFragment()
+            val supportFragmentManager = childFragmentManager
+            captureDialogFragment.show(supportFragmentManager, "capture")
         }
 
         // skillボタンが押された時の処理
@@ -147,12 +149,18 @@ class BeTrappedFragment: Fragment() {
         }
 
         viewModel.isOverTrapTime.observe(viewLifecycleOwner) {
-            findNavController().navigate(R.id.navigation_main)
+            // TrapTimeが終われば、もとのFragmentに戻る
+            if (it) {
+                findNavController().navigate(R.id.navigation_main)
+            }
         }
 
         viewModel.isOverLimitTime.observe(viewLifecycleOwner) {
             if (it) {
-                // TODO: Clearダイアログの表示
+                // クリアダイアログを表示
+                val successEscapeDialogFragment = SuccessEscapeDialogFragment()
+                val supportFragmentManager = childFragmentManager
+                successEscapeDialogFragment.show(supportFragmentManager, "clear")
             }
         }
 
