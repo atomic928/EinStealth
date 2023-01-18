@@ -141,42 +141,6 @@ class MainFragment: Fragment() {
         // User captured
         val user1Captured:    ImageView = binding.user1Captured
 
-        // 罠にかかったとき
-        val mapHide:          ImageView   = binding.ivHideMap
-        val ivEye:            ImageView   = binding.ivEye
-        val tvTrap:           TextView    = binding.tvTrap
-        val trapDialogText:   ImageView   = binding.textOniTrap
-        val trapDialogDemon:  ImageView   = binding.ivOniTrap
-        val progressTrap:     ProgressBar = binding.progressTrap
-
-        // 罠に掛かると、このダイアログが最初に出るようにしたい
-        // できればアニメーションつけたいけど、むずいので一旦放置
-        fun changeTrapDialog(isOn: Boolean) {
-            if (isOn) {
-                trapDialogText.visibility  = View.VISIBLE
-                trapDialogDemon.visibility = View.VISIBLE
-            } else {
-                trapDialogText.visibility  = View.INVISIBLE
-                trapDialogDemon.visibility = View.INVISIBLE
-            }
-        }
-
-        fun changeIsCapturedInTrapVisible(isOn: Boolean) {
-            if (isOn) {
-                mapHide.visibility         = View.INVISIBLE
-                ivEye.visibility           = View.INVISIBLE
-                tvTrap.visibility          = View.INVISIBLE
-                progressTrap.visibility    = View.INVISIBLE
-            } else {
-                mapHide.visibility         = View.VISIBLE
-                ivEye.visibility           = View.VISIBLE
-                tvTrap.visibility          = View.VISIBLE
-                progressTrap.visibility    = View.VISIBLE
-
-                progressTrap.max = 60
-            }
-        }
-
         // クリアしたとき
         val dialogClear:      ImageView = binding.dialogClear
         val dialogClearUser1: ImageView = binding.dialogClearUser1
@@ -234,11 +198,6 @@ class MainFragment: Fragment() {
             btCaptureOn.visibility      = visibility
             btCaptureOff.visibility     = visibility
 
-            ivEye.visibility           = visibility
-            tvTrap.visibility          = visibility
-            trapDialogText.visibility  = visibility
-            trapDialogDemon.visibility = visibility
-
             dialogClear.visibility      = visibility
             dialogClearUser1.visibility = visibility
             btClearClose.visibility     = visibility
@@ -261,7 +220,7 @@ class MainFragment: Fragment() {
                 // 制限時間になったかどうかの判定
                 viewModel.limitTime.observe(viewLifecycleOwner) { limitTime ->
                     viewModel.compareTime(userLive[userLive.size-1].relativeTime, limitTime)
-//                    setFragmentResult("requestLimit", bundleOf("bundleLimit" to limitTime))
+                    setFragmentResult("requestLimit", bundleOf("bundleLimit" to limitTime))
                 }
 
                 // 自分の位置情報のurl
@@ -296,20 +255,13 @@ class MainFragment: Fragment() {
                                 url += "&markers=icon:https://onl.bz/FetpS7Y|${allTrap[i].latitude},${allTrap[i].longitude}"
                             }
                             if (viewModel.checkCaughtTrap(userLive[userLive.size-1], allTrap[i])) {
-//                                setFragmentResult("requestTrap", bundleOf("bundleTrap" to userLive[userLive.size-1].relativeTime))
-//                                setFragmentResult("requestTrapNumber", bundleOf("bundleTrapNumber" to trapNumber))
-//                                findNavController().navigate(R.id.navigation_be_trapped)
-                                context?.let { viewModel.setTrapTime(it) }
+                                // TrapにかかったらFragmentを移動
+                                setFragmentResult("requestTrap", bundleOf("bundleTrap" to userLive[userLive.size-1].relativeTime))
+                                setFragmentResult("requestTrapNumber", bundleOf("bundleTrapNumber" to trapNumber))
+                                findNavController().navigate(R.id.navigation_be_trapped)
                             }
                         }
                     }
-                }
-
-                // trapにかかっている時間を計測
-                viewModel.trapTime.observe(viewLifecycleOwner) { trapTime ->
-                    viewModel.compareTrapTime(userLive[userLive.size-1].relativeTime, trapTime)
-                    val howProgressTrap = viewModel.howProgressTrapTime(userLive[userLive.size-1].relativeTime, trapTime)
-                    progressTrap.progress = howProgressTrap
                 }
 
                 // Skill Buttonの Progress Bar
@@ -378,14 +330,10 @@ class MainFragment: Fragment() {
 
         // 捕まったボタンが押された時の処理
         btCaptureOn.setOnClickListener {
-//            // ボタンを押された状態にする
-//            changeBtCaptureVisible(false)
-//            // 捕まったか確認するダイアログが出現
-//            changeCaptureDialogVisible(View.VISIBLE)
-            setFragmentResult("requestLimit", bundleOf("bundleLimit" to "23:59:00"))
-            setFragmentResult("requestTrap", bundleOf("bundleTrap" to "23:59:00"))
-            setFragmentResult("requestTrapNumber", bundleOf("bundleTrapNumber" to trapNumber))
-            findNavController().navigate(R.id.navigation_be_trapped)
+            // ボタンを押された状態にする
+            changeBtCaptureVisible(false)
+            // 捕まったか確認するダイアログが出現
+            changeCaptureDialogVisible(View.VISIBLE)
         }
 
         btCaptureNo.setOnClickListener {
@@ -429,10 +377,6 @@ class MainFragment: Fragment() {
 
         viewModel.isOverSkillTime.observe(viewLifecycleOwner) {
             changeBtSkillVisible(it)
-        }
-
-        viewModel.isOverTrapTime.observe(viewLifecycleOwner) {
-            changeIsCapturedInTrapVisible(it)
         }
 
         // Mapに画像をセット

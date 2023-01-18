@@ -48,6 +48,20 @@ class BeTrappedFragment: Fragment() {
         val btSkillOff:       ImageView   = binding.btSkillOff
         val progressSkill:    ProgressBar = binding.progressSkill
 
+        fun changeBtSkillVisible(isOn: Boolean) {
+            if (isOn) {
+                btSkillOn.visibility     = View.VISIBLE
+                btSkillOff.visibility    = View.INVISIBLE
+                progressSkill.visibility = View.INVISIBLE
+            } else {
+                btSkillOn.visibility     = View.INVISIBLE
+                btSkillOff.visibility    = View.VISIBLE
+                progressSkill.visibility = View.VISIBLE
+
+                progressSkill.max = 60
+            }
+        }
+
         // Trapが解除されるまでのプログレスバー
         val progressTrap:     ProgressBar = binding.progressTrap
 
@@ -129,11 +143,17 @@ class BeTrappedFragment: Fragment() {
         }
 
         viewModel.isOverSkillTime.observe(viewLifecycleOwner) {
-            // TODO: Clearダイアログの表示
+            changeBtSkillVisible(it)
         }
 
         viewModel.isOverTrapTime.observe(viewLifecycleOwner) {
             findNavController().navigate(R.id.navigation_main)
+        }
+
+        viewModel.isOverLimitTime.observe(viewLifecycleOwner) {
+            if (it) {
+                // TODO: Clearダイアログの表示
+            }
         }
 
         return root

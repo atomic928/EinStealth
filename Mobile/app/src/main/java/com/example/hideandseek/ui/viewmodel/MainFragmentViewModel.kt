@@ -45,14 +45,6 @@ class MainFragmentViewModel: ViewModel() {
         _skillTime.value = nowUser.relativeTime
     }
 
-    private val _trapTime = MutableLiveData<String>()
-    val trapTime: LiveData<String> = _trapTime
-
-    fun setTrapTime(context: Context) {
-        val nowUser = UserRepository(context).nowUser
-        _trapTime.value = nowUser.relativeTime
-    }
-
     fun setUserLive(context: Context) {
         userLive = UserRepository(context).allUsers.asLiveData()
     }
@@ -103,16 +95,6 @@ class MainFragmentViewModel: ViewModel() {
         }
     }
 
-    private val _isOverTrapTime = MutableLiveData<Boolean>()
-    val isOverTrapTime: LiveData<Boolean> = _isOverTrapTime
-
-    fun compareTrapTime(relativeTime: String, trapTime: String) {
-        Log.d("CompareTrapTime", "relative: $relativeTime, trap: $trapTime")
-        if (relativeTime.substring(6, 8) == trapTime.substring(6, 8)) {
-            _isOverTrapTime.value = relativeTime != trapTime
-        }
-    }
-
     fun checkCaughtTrap(user: UserData, trap: TrapData): Boolean {
         // UserがTrapと一定の距離に来たかどうかを返す
         Log.d("checkCaughtTrap", (abs(user.latitude-trap.latitude) + abs(user.longitude-trap.longitude)).toString())
@@ -132,15 +114,6 @@ class MainFragmentViewModel: ViewModel() {
             return (60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60
         } else {
             return relativeTime.substring(6).toInt()-skillTime.substring(6).toInt()
-        }
-    }
-
-    fun howProgressTrapTime(relativeTime: String, trapTime: String): Int {
-        Log.d("HowProgressTrap", ((60+relativeTime.substring(6).toInt()-trapTime.substring(6).toInt())%60).toString())
-        if (relativeTime.substring(6).toInt() < trapTime.substring(6).toInt()) {
-            return (60+relativeTime.substring(6).toInt()-trapTime.substring(6).toInt())%60
-        } else {
-            return relativeTime.substring(6).toInt()-trapTime.substring(6).toInt()
         }
     }
 
