@@ -261,6 +261,7 @@ class MainFragment: Fragment() {
                 // 制限時間になったかどうかの判定
                 viewModel.limitTime.observe(viewLifecycleOwner) { limitTime ->
                     viewModel.compareTime(userLive[userLive.size-1].relativeTime, limitTime)
+//                    setFragmentResult("requestLimit", bundleOf("bundleLimit" to limitTime))
                 }
 
                 // 自分の位置情報のurl
@@ -295,6 +296,9 @@ class MainFragment: Fragment() {
                                 url += "&markers=icon:https://onl.bz/FetpS7Y|${allTrap[i].latitude},${allTrap[i].longitude}"
                             }
                             if (viewModel.checkCaughtTrap(userLive[userLive.size-1], allTrap[i])) {
+//                                setFragmentResult("requestTrap", bundleOf("bundleTrap" to userLive[userLive.size-1].relativeTime))
+//                                setFragmentResult("requestTrapNumber", bundleOf("bundleTrapNumber" to trapNumber))
+//                                findNavController().navigate(R.id.navigation_be_trapped)
                                 context?.let { viewModel.setTrapTime(it) }
                             }
                         }
@@ -378,7 +382,9 @@ class MainFragment: Fragment() {
 //            changeBtCaptureVisible(false)
 //            // 捕まったか確認するダイアログが出現
 //            changeCaptureDialogVisible(View.VISIBLE)
-            setFragmentResult("trapTime", bundleOf("trapTime" to "text"))
+            setFragmentResult("requestLimit", bundleOf("bundleLimit" to "23:59:00"))
+            setFragmentResult("requestTrap", bundleOf("bundleTrap" to "23:59:00"))
+            setFragmentResult("requestTrapNumber", bundleOf("bundleTrapNumber" to trapNumber))
             findNavController().navigate(R.id.navigation_be_trapped)
         }
 
