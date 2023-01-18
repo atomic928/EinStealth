@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -87,19 +88,6 @@ class MainFragment: Fragment() {
 
                 progressSkill.max = 60
             }
-        }
-
-        // 捕まったか確認するダイアログ
-        val dialogCapture:    ImageView = binding.dialogCapture
-        val ivDemonCapture:   ImageView = binding.dialogCaptureDemon
-        val btCaptureYes:     ImageView = binding.btCaptureYes
-        val btCaptureNo:      ImageView = binding.btCaptureNo
-
-        fun changeCaptureDialogVisible(visibility: Int) {
-            dialogCapture.visibility  = visibility
-            ivDemonCapture.visibility = visibility
-            btCaptureYes.visibility   = visibility
-            btCaptureNo.visibility    = visibility
         }
 
         // 捕まった後のダイアログ
@@ -221,11 +209,6 @@ class MainFragment: Fragment() {
             btSkillOn.visibility      = visibility
             btSkillOff.visibility     = visibility
             progressSkill.visibility  = visibility
-
-            dialogCapture.visibility  = visibility
-            ivDemonCapture.visibility = visibility
-            btCaptureYes.visibility   = visibility
-            btCaptureNo.visibility    = visibility
 
             btCaptureOn.visibility      = visibility
             btCaptureOff.visibility     = visibility
@@ -370,25 +353,9 @@ class MainFragment: Fragment() {
 
         // 捕まったボタンが押された時の処理
         btCaptureOn.setOnClickListener {
-            // ボタンを押された状態にする
-            changeBtCaptureVisible(false)
-            // 捕まったか確認するダイアログが出現
-            changeCaptureDialogVisible(View.VISIBLE)
-        }
-
-        btCaptureNo.setOnClickListener {
-            // ボタンを押されていない状態にする
-            changeBtCaptureVisible(true)
-            // 捕まったか確認するダイアログが消える
-            changeCaptureDialogVisible(View.INVISIBLE)
-        }
-
-        btCaptureYes.setOnClickListener {
-            // 捕まったか確認するダイアログが消える
-            changeCaptureDialogVisible(View.INVISIBLE)
-
-            // 捕まったダイアログが出る
-            changeAfterCaptureDialogVisible(View.VISIBLE)
+            val captureDialogFragment = CaptureDialogFragment()
+            val supportFragmentManager = childFragmentManager
+            captureDialogFragment.show(supportFragmentManager, "capture")
         }
 
         btCapturedClose.setOnClickListener {
