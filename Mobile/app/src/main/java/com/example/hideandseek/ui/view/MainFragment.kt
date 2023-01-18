@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -370,10 +371,19 @@ class MainFragment: Fragment() {
 
         // 捕まったボタンが押された時の処理
         btCaptureOn.setOnClickListener {
-            // ボタンを押された状態にする
-            changeBtCaptureVisible(false)
-            // 捕まったか確認するダイアログが出現
-            changeCaptureDialogVisible(View.VISIBLE)
+//            // ボタンを押された状態にする
+//            changeBtCaptureVisible(false)
+//            // 捕まったか確認するダイアログが出現
+//            changeCaptureDialogVisible(View.VISIBLE)
+            val captureDialogFragment = CaptureDialogFragment()
+            val supportFragmentManager = childFragmentManager
+//            val transaction = supportFragmentManager.beginTransaction()
+//            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//            transaction
+//                .add(android.R.id.content, captureDialogFragment)
+//                .addToBackStack(null)
+//                .commit()
+            captureDialogFragment.show(supportFragmentManager, "capture")
         }
 
         btCaptureNo.setOnClickListener {
