@@ -64,6 +64,7 @@ class BeTrappedFragment: Fragment() {
 
         // Trapが解除されるまでのプログレスバー
         val progressTrap:     ProgressBar = binding.progressTrap
+        progressTrap.max = 60
 
         setFragmentResultListener("requestLimit") {key, bundle ->
             val result = bundle.getString("bundleLimit")
