@@ -90,21 +90,6 @@ class MainFragment: Fragment() {
             }
         }
 
-        // 捕まった後のダイアログ
-        val dialogCaptured:   ImageView = binding.dialogCaptured
-        val ivDemonCaptured:  ImageView = binding.dialogCapturedDemon
-        val ivNormalCaptured: ImageView = binding.dialogCapturedNormal
-        val metalRod:         ImageView = binding.metalRod
-        val btCapturedClose:  ImageView = binding.capturedClose
-
-        fun changeAfterCaptureDialogVisible(visibility: Int) {
-            dialogCaptured.visibility   = visibility
-            ivDemonCaptured.visibility  = visibility
-            ivNormalCaptured.visibility = visibility
-            metalRod.visibility         = visibility
-            btCapturedClose.visibility  = visibility
-        }
-
         // 観戦中
         val ivWatching:       ImageView = binding.ivWatching
 
@@ -331,18 +316,6 @@ class MainFragment: Fragment() {
             val captureDialogFragment = CaptureDialogFragment()
             val supportFragmentManager = childFragmentManager
             captureDialogFragment.show(supportFragmentManager, "capture")
-        }
-
-        btCapturedClose.setOnClickListener {
-            // 捕まったダイアログが消える
-            changeAfterCaptureDialogVisible(View.INVISIBLE)
-
-            // 観戦モードになる
-            changeStatusCaptured()
-
-            // ステータスが変わる
-            user1Normal.visibility   = View.INVISIBLE
-            user1Captured.visibility = View.VISIBLE
         }
 
         // skillボタンが押された時の処理
