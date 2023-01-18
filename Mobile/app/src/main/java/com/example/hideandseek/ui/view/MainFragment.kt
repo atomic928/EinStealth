@@ -161,17 +161,6 @@ class MainFragment: Fragment() {
             }
         }
 
-        // クリアしたとき
-        val dialogClear:      ImageView = binding.dialogClear
-        val dialogClearUser1: ImageView = binding.dialogClearUser1
-        val btClearClose:     ImageView = binding.clearClose
-
-        fun changeClearDialogVisible(visibility: Int) {
-            dialogClear.visibility      = visibility
-            dialogClearUser1.visibility = visibility
-            btClearClose.visibility     = visibility
-        }
-
         // Result画面
         val resultBack:       ImageView = binding.resultBack
         val tvResult:         TextView  = binding.tvResult
@@ -217,10 +206,6 @@ class MainFragment: Fragment() {
             tvTrap.visibility          = visibility
             trapDialogText.visibility  = visibility
             trapDialogDemon.visibility = visibility
-
-            dialogClear.visibility      = visibility
-            dialogClearUser1.visibility = visibility
-            btClearClose.visibility     = visibility
         }
 
 
@@ -326,20 +311,10 @@ class MainFragment: Fragment() {
         viewModel.isOverLimitTime.observe(viewLifecycleOwner) {
             if (it) {
                 // クリアダイアログを表示
-                changeClearDialogVisible(View.VISIBLE)
+                val successEscapeDialogFragment = SuccessEscapeDialogFragment()
+                val supportFragmentManager = childFragmentManager
+                successEscapeDialogFragment.show(supportFragmentManager, "clear")
             }
-        }
-
-        // クリアダイアログの閉じるを押した時
-        btClearClose.setOnClickListener {
-            // クリアダイアログを非表示
-            changeClearDialogVisible(View.INVISIBLE)
-
-            // Resultダイアログの表示
-            changeResultDialogVisible(View.VISIBLE)
-
-            // Result以外のものを非表示
-            changeOtherResultDialog(View.INVISIBLE)
         }
 
         // Resultダイアログの閉じるを押した時の処理
