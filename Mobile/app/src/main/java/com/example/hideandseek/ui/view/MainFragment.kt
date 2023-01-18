@@ -14,11 +14,15 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import com.example.hideandseek.R
 import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.databinding.FragmentMainBinding
@@ -120,7 +124,7 @@ class MainFragment: Fragment() {
         // 観戦中
         val ivWatching:       ImageView = binding.ivWatching
 
-        // 捕まってステータスが捕まったになったら観戦モードになる
+        // 捕まってステータスが捕まったになったら観戦モードになるkiwoj
         fun changeStatusCaptured() {
             ivWatching.visibility   = View.VISIBLE
             changeBtCaptureVisible(false)
@@ -370,10 +374,12 @@ class MainFragment: Fragment() {
 
         // 捕まったボタンが押された時の処理
         btCaptureOn.setOnClickListener {
-            // ボタンを押された状態にする
-            changeBtCaptureVisible(false)
-            // 捕まったか確認するダイアログが出現
-            changeCaptureDialogVisible(View.VISIBLE)
+//            // ボタンを押された状態にする
+//            changeBtCaptureVisible(false)
+//            // 捕まったか確認するダイアログが出現
+//            changeCaptureDialogVisible(View.VISIBLE)
+            setFragmentResult("trapTime", bundleOf("trapTime" to "text"))
+            findNavController().navigate(R.id.navigation_be_trapped)
         }
 
         btCaptureNo.setOnClickListener {
