@@ -34,6 +34,10 @@ class BeTrappedFragmentViewModel: ViewModel() {
         _skillTime.value = nowUser.relativeTime
     }
 
+    fun setSkillTimeInit(skillTime: String) {
+        _skillTime.value = skillTime
+    }
+
     private val _trapTime = MutableLiveData<String>()
     val trapTime: LiveData<String> = _trapTime
 

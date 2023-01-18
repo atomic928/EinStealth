@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -25,6 +26,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
 import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.datasource.remote.PostData
+import com.example.hideandseek.data.repository.UserRepository
 import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModel
 import kotlinx.coroutines.*
@@ -178,6 +180,27 @@ class MainFragment: Fragment() {
             viewModel.setAllTrapsLive(it)
         }
 
+        // BeTrappedFragmentから戻ってきた時
+        setFragmentResultListener("BeTrappedFragmentSkillTime") {key, bundle ->
+            val result = bundle.getString("skillTime")
+            Log.d("skillTimeResultFragment", result.toString())
+            if (result != null) {
+                viewModel.setSkillTImeString(result)
+            }
+        }
+
+        setFragmentResultListener("BeTrappedFragmentIsOverSkillTime") {key, bundle ->
+            val result = bundle.getBoolean("isOverSkillTime")
+            Log.d("isOverSkillTimeResultFragment", result.toString())
+            viewModel.setIsOverSkillTime(result)
+        }
+
+        setFragmentResultListener("BeTrappedFragmentTrapNumber") {key, bundle ->
+            val result = bundle.getInt("trapNumber")
+            Log.d("trapNumber", result.toString())
+            trapNumber = result
+        }
+
         // 自分の情報の表示
         viewModel.userLive.observe(viewLifecycleOwner) { userLive ->
             Log.d("UserLive", userLive.toString())
@@ -187,7 +210,7 @@ class MainFragment: Fragment() {
                 // 制限時間になったかどうかの判定
                 viewModel.limitTime.observe(viewLifecycleOwner) { limitTime ->
                     viewModel.compareTime(userLive[userLive.size-1].relativeTime, limitTime)
-                    setFragmentResult("requestLimit", bundleOf("bundleLimit" to limitTime))
+                    setFragmentResult("MainFragmentLimitTime", bundleOf("limitTime" to limitTime))
                 }
 
                 // 自分の位置情報のurl
@@ -223,8 +246,9 @@ class MainFragment: Fragment() {
                             }
                             if (viewModel.checkCaughtTrap(userLive[userLive.size-1], allTrap[i])) {
                                 // TrapにかかったらFragmentを移動
-                                setFragmentResult("requestTrap", bundleOf("bundleTrap" to userLive[userLive.size-1].relativeTime))
-                                setFragmentResult("requestTrapNumber", bundleOf("bundleTrapNumber" to trapNumber))
+                                setFragmentResult("MainFragmentTrapNumber", bundleOf("trapNumber" to trapNumber))
+                                setFragmentResult("MainFragmentTrapTime", bundleOf("trapTime" to userLive[userLive.size-1].relativeTime))
+
                                 findNavController().navigate(R.id.navigation_be_trapped)
                             }
                         }
@@ -243,6 +267,7 @@ class MainFragment: Fragment() {
                         progressSkill.progress = viewModel.howProgressSkillTime(userLive[userLive.size-1].relativeTime,
                             skillTime
                         )
+                        setFragmentResult("MainFragmentSkillTime", bundleOf("skillTime" to skillTime))
                     }
                 }
 
@@ -308,6 +333,7 @@ class MainFragment: Fragment() {
         btSkillOn.setOnClickListener {
             // Userの最新情報から位置をとってきて、それを罠の位置とする
             context?.let {
+                setFragmentResult("MainFragmentSkillTime", bundleOf("skillTime" to UserRepository(it).nowUser.relativeTime))
                 viewModel.postTrapRoom(it, 0)
                 viewModel.postTrapSpacetime(it)
                 viewModel.setSkillTime(it)
@@ -317,6 +343,7 @@ class MainFragment: Fragment() {
         }
 
         viewModel.isOverSkillTime.observe(viewLifecycleOwner) {
+            setFragmentResult("MainFragmentIsOverSkillTime", bundleOf("isOverSkillTime" to it))
             changeBtSkillVisible(it)
         }
 

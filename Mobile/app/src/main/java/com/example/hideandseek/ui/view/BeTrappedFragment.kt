@@ -15,6 +15,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
+import com.example.hideandseek.data.repository.UserRepository
 import com.example.hideandseek.databinding.FragmentBeTrappedBinding
 import com.example.hideandseek.ui.viewmodel.BeTrappedFragmentViewModel
 import kotlinx.coroutines.launch
@@ -66,24 +67,41 @@ class BeTrappedFragment: Fragment() {
         val progressTrap:     ProgressBar = binding.progressTrap
         progressTrap.max = 60
 
-        setFragmentResultListener("requestLimit") {key, bundle ->
-            val result = bundle.getString("bundleLimit")
+        setFragmentResultListener("MainFragmentLimitTime") {key, bundle ->
+            val result = bundle.getString("limitTime")
+            Log.d("limitTimeResultListener", result.toString())
             tvLimitTime.text = result
             if (result != null) {
                 viewModel.setLimitTime(result)
             }
         }
 
-        setFragmentResultListener("requestTrap") {key, bundle ->
-            val result = bundle.getString("bundleTrap")
+        setFragmentResultListener("MainFragmentTrapTime") {key, bundle ->
+            val result = bundle.getString("trapTime")
+            Log.d("trapTimeResultListener", result.toString())
             if (result != null) {
                 viewModel.setTrapTime(result)
             }
         }
 
-        setFragmentResultListener("requestTrapNumber") {key, bundle ->
-            val result = bundle.getInt("bundleTrapNumber")
+        setFragmentResultListener("MainFragmentTrapNumber") {key, bundle ->
+            val result = bundle.getInt("trapNumber")
+            Log.d("trapNumberResultListener", result.toString())
             trapNumber = result
+        }
+
+        setFragmentResultListener("MainFragmentSkillTime") {key, bundle ->
+            val result = bundle.getString("skillTime")
+            Log.d("skillTimeResultListener", result.toString())
+            if (result != null) {
+                viewModel.setSkillTimeInit(result)
+            }
+        }
+
+        setFragmentResultListener("MainFragmentIsOverSkillTime") {key, bundle ->
+            val result = bundle.getBoolean("isOverSkillTime")
+            Log.d("isOverSKillTimeResultListener", result.toString())
+            viewModel.setIsOverSkillTime(result)
         }
 
         // データベースからデータを持ってくる
@@ -121,6 +139,7 @@ class BeTrappedFragment: Fragment() {
                         progressSkill.progress = viewModel.howProgressSkillTime(userLive[userLive.size-1].relativeTime,
                             skillTime
                         )
+                        setFragmentResult("BeTrappedFragmentSkillTime", bundleOf("skillTime" to skillTime))
                     }
                 }
             }
@@ -137,6 +156,7 @@ class BeTrappedFragment: Fragment() {
         btSkillOn.setOnClickListener {
             // Userの最新情報から位置をとってきて、それを罠の位置とする
             context?.let {
+                setFragmentResult("BeTrappedFragmentSkillTime", bundleOf("skillTime" to UserRepository(it).nowUser.relativeTime))
                 viewModel.postTrapRoom(it, 0)
                 viewModel.postTrapSpacetime(it)
                 viewModel.setSkillTime(it)
@@ -146,12 +166,14 @@ class BeTrappedFragment: Fragment() {
         }
 
         viewModel.isOverSkillTime.observe(viewLifecycleOwner) {
+            setFragmentResult("BeTrappedFragmentIsOverSkillTime", bundleOf("isOverSkillTime" to it))
             changeBtSkillVisible(it)
         }
 
         viewModel.isOverTrapTime.observe(viewLifecycleOwner) {
             // TrapTimeが終われば、もとのFragmentに戻る
             if (it) {
+                setFragmentResult("BeTrappedFragmentTrapNumber", bundleOf("trapNumber" to trapNumber))
                 findNavController().navigate(R.id.navigation_main)
             }
         }
