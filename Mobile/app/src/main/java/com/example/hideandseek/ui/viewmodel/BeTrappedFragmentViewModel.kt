@@ -38,22 +38,8 @@ class BeTrappedFragmentViewModel: ViewModel() {
         _skillTime.value = skillTime
     }
 
-    private val _trapTime = MutableLiveData<String>()
-    val trapTime: LiveData<String> = _trapTime
-
-    fun setTrapTime(trapTime: String) {
-        _trapTime.value = trapTime
-    }
-
     fun setUserLive(context: Context) {
         userLive = UserRepository(context).allUsers.asLiveData()
-    }
-
-    private val _limitTime = MutableLiveData<String>()
-    val limitTime: LiveData<String> = _limitTime
-
-    fun setLimitTime(limitTime: String) {
-        _limitTime.value = limitTime
     }
 
     private val _isOverLimitTime = MutableLiveData<Boolean>()

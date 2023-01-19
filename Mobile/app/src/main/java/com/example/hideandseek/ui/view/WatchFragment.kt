@@ -13,6 +13,8 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
+import com.example.hideandseek.data.datasource.local.LocationData
+import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.databinding.FragmentWatchBinding
 import com.example.hideandseek.ui.viewmodel.WatchFragmentViewModel
@@ -47,6 +49,18 @@ class WatchFragment: Fragment() {
             viewModel.setAllTrapsLive(it)
         }
 
+        // 2重LiveData解消のために変数定義
+        var allLocation: List<LocationData> = listOf()
+        var allTraps: List<TrapData> = listOf()
+
+        viewModel.allLocationsLive.observe(viewLifecycleOwner) {
+            allLocation = it
+        }
+
+        viewModel.allTrapsLive.observe(viewLifecycleOwner) {
+            allTraps = it
+        }
+
         // 自分の情報の表示
         viewModel.userLive.observe(viewLifecycleOwner) { userLive ->
             Log.d("UserLive", userLive.toString())
@@ -61,27 +75,23 @@ class WatchFragment: Fragment() {
                         "&markers=icon:" + iconUrlHide + "|${userLive[userLive.size-1].latitude},${userLive[userLive.size-1].longitude}"
 
                 // 他人の位置を追加
-                viewModel.allLocationsLive.observe(viewLifecycleOwner) { allLocationLive ->
-                    Log.d("ALL_Location", allLocationLive.toString())
-                    if (allLocationLive.isNotEmpty()) {
-                        // ユーザーの位置情報
-                        for (i in allLocationLive.indices) {
-                            if (allLocationLive[i].objId == 1) {
-                                context?.let { context -> viewModel.postTrapRoom(context, 1) }
-                            } else {
-                                url += "&markers=icon:" + iconUrlHide + "|${allLocationLive[i].latitude},${allLocationLive[i].longitude}"
-                            }
+                Log.d("ALL_Location", allLocation.toString())
+                if (allLocation.isNotEmpty()) {
+                    // ユーザーの位置情報
+                    for (i in allLocation.indices) {
+                        if (allLocation[i].objId == 1) {
+                            context?.let { context -> viewModel.postTrapRoom(context, 1) }
+                        } else {
+                            url += "&markers=icon:" + iconUrlHide + "|${allLocation[i].latitude},${allLocation[i].longitude}"
                         }
                     }
                 }
 
                 // trapの位置情報
-                viewModel.allTrapsLive.observe(viewLifecycleOwner) { allTrap ->
-                    if (allTrap.isNotEmpty()) {
-                        for (i in allTrap.indices) {
-                            if (allTrap[i].objId == 0) {
-                                url += "&markers=icon:https://onl.bz/FetpS7Y|${allTrap[i].latitude},${allTrap[i].longitude}"
-                            }
+                if (allTraps.isNotEmpty()) {
+                    for (i in allTraps.indices) {
+                        if (allTraps[i].objId == 0) {
+                            url += "&markers=icon:https://onl.bz/FetpS7Y|${allTraps[i].latitude},${allTraps[i].longitude}"
                         }
                     }
                 }
