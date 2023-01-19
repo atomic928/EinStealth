@@ -17,4 +17,10 @@
         android:label="BeTrapped"
         tools:layout="@layout/fragment_be_trapped"/>
 
+    <fragment
+        android:id="@+id/navigation_result"
+        android:name="com.example.hideandseek.ui.view.ResultFragment"
+        android:label="Result"
+        tools:layout="@layout/fragment_result"/>
+
 </navigation>
