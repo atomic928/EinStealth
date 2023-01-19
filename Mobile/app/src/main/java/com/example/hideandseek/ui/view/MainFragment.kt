@@ -89,29 +89,6 @@ class MainFragment: Fragment() {
         // User captured
         val user1Captured:    ImageView = binding.user1Captured
 
-        // Result画面
-        val resultBack:       ImageView = binding.resultBack
-        val tvResult:         TextView  = binding.tvResult
-        val tvWinner:         TextView  = binding.tvWinner
-        val tvLoser:          TextView  = binding.tvLoser
-        val winnerUser1:      ImageView = binding.winnerUser1
-        val winnerUser2:      ImageView = binding.winnerUser2
-        val loserUser3:       ImageView = binding.loserUser3
-        val loserUser4:       ImageView = binding.loserUser4
-        val btResultClose:    ImageView = binding.btResultClose
-
-        fun changeResultDialogVisible(visibility: Int) {
-            resultBack.visibility    = visibility
-            tvResult.visibility      = visibility
-            tvWinner.visibility      = visibility
-            tvLoser.visibility       = visibility
-            winnerUser1.visibility   = visibility
-            winnerUser2.visibility   = visibility
-            loserUser3.visibility    = visibility
-            loserUser4.visibility    = visibility
-            btResultClose.visibility = visibility
-        }
-
         fun changeOtherResultDialog(visibility: Int) {
             ivTime.visibility         = visibility
             tvNow.visibility          = visibility
@@ -258,15 +235,6 @@ class MainFragment: Fragment() {
                 val supportFragmentManager = childFragmentManager
                 successEscapeDialogFragment.show(supportFragmentManager, "clear")
             }
-        }
-
-        // Resultダイアログの閉じるを押した時の処理
-        btResultClose.setOnClickListener {
-            // Resultダイアログの非表示
-            changeResultDialogVisible(View.INVISIBLE)
-
-            // Result以外のものを表示
-            changeOtherResultDialog(View.VISIBLE)
         }
 
         // 捕まったボタンが押された時の処理

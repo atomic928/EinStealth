@@ -17,4 +17,10 @@
         android:icon="@drawable/ic_launcher_background"
         android:title="watch"
         />
+        
+    <item
+        android:id="@+id/navigation_result"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="result"
+        />
 </menu>

@@ -23,5 +23,10 @@
         android:label="Watch"
         tools:layout="@layout/fragment_watch"/>
 
+    <fragment
+        android:id="@+id/navigation_result"
+        android:name="com.example.hideandseek.ui.view.ResultFragment"
+        android:label="Result"
+        tools:layout="@layout/fragment_result"/>
 
 </navigation>
