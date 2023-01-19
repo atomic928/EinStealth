@@ -24,8 +24,6 @@ class MainFragment: Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val viewModel: MainFragmentViewModel by viewModels()
 
-    private var trapNumber = 0
-
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     private val binding get() = _binding!!
@@ -34,32 +32,18 @@ class MainFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         val root: View = binding.root
         
         // Viewの取得
         // 時間表示の場所
-        val ivTime:           ImageView = binding.ivTime
-        val tvNow:            TextView  = binding.tvNow
-        val tvLimit:          TextView  = binding.tvLimit
         val tvRelativeTime:   TextView  = binding.tvRelativeTime
         val tvLimitTime:      TextView  = binding.tvLimitTime
         // Map
         val ivMap:            ImageView = binding.ivMap
         // 捕まったボタン
         val btCaptureOn:      ImageView = binding.btCaptureOn
-        val btCaptureOff:     ImageView = binding.btCaptureOff
-
-        fun changeBtCaptureVisible(isOn: Boolean) {
-            if (isOn) {
-                btCaptureOn.visibility  = View.VISIBLE
-                btCaptureOff.visibility = View.INVISIBLE
-            } else {
-                btCaptureOn.visibility  = View.INVISIBLE
-                btCaptureOff.visibility = View.VISIBLE
-            }
-        }
 
         // スキルボタン
         val btSkillOn:        ImageView   = binding.btSkillOn
@@ -81,6 +65,7 @@ class MainFragment: Fragment() {
         }
 
         // User normal
+        // TODO: Statusを受け取って表示が切り替わるようにする
         val user1Normal:      ImageView = binding.user1Normal
         val user2Normal:      ImageView = binding.user2Normal
         val user3Normal:      ImageView = binding.user3Normal
@@ -88,26 +73,6 @@ class MainFragment: Fragment() {
         val user4Demon:       ImageView = binding.user4Demon
         // User captured
         val user1Captured:    ImageView = binding.user1Captured
-
-        fun changeOtherResultDialog(visibility: Int) {
-            ivTime.visibility         = visibility
-            tvNow.visibility          = visibility
-            tvLimit.visibility        = visibility
-            tvRelativeTime.visibility = visibility
-            tvLimitTime.visibility    = visibility
-            user1Normal.visibility    = visibility
-            user2Normal.visibility    = visibility
-            user3Normal.visibility    = visibility
-            user4Demon.visibility     = visibility
-            user1Captured.visibility  = visibility
-            btSkillOn.visibility      = visibility
-            btSkillOff.visibility     = visibility
-            progressSkill.visibility  = visibility
-
-            btCaptureOn.visibility      = visibility
-            btCaptureOff.visibility     = visibility
-        }
-
 
         // データベースからデータを持ってくる
         context?.let {
@@ -117,7 +82,7 @@ class MainFragment: Fragment() {
         }
 
         // BeTrappedFragmentから戻ってきた時
-        setFragmentResultListener("BeTrappedFragmentSkillTime") {key, bundle ->
+        setFragmentResultListener("BeTrappedFragmentSkillTime") {_, bundle ->
             val result = bundle.getString("skillTime")
             Log.d("skillTimeResultFragment", result.toString())
             if (result != null) {
@@ -125,16 +90,10 @@ class MainFragment: Fragment() {
             }
         }
 
-        setFragmentResultListener("BeTrappedFragmentIsOverSkillTime") {key, bundle ->
+        setFragmentResultListener("BeTrappedFragmentIsOverSkillTime") {_, bundle ->
             val result = bundle.getBoolean("isOverSkillTime")
             Log.d("isOverSkillTimeResultFragment", result.toString())
             viewModel.setIsOverSkillTime(result)
-        }
-
-        setFragmentResultListener("BeTrappedFragmentTrapNumber") {key, bundle ->
-            val result = bundle.getInt("trapNumber")
-            Log.d("trapNumber", result.toString())
-            trapNumber = result
         }
 
         // 自分の情報の表示
@@ -182,7 +141,6 @@ class MainFragment: Fragment() {
                             }
                             if (viewModel.checkCaughtTrap(userLive[userLive.size-1], allTrap[i])) {
                                 // TrapにかかったらFragmentを移動
-                                setFragmentResult("MainFragmentTrapNumber", bundleOf("trapNumber" to trapNumber))
                                 setFragmentResult("MainFragmentTrapTime", bundleOf("trapTime" to userLive[userLive.size-1].relativeTime))
 
                                 findNavController().navigate(R.id.navigation_be_trapped)
@@ -195,8 +153,8 @@ class MainFragment: Fragment() {
                 // スキルボタンを複数回押したとき、relativeが一旦最初の(skillTime+1)秒になって、本来のrelativeまで1秒ずつ足される
                 // observeを二重にしてるせいで変な挙動していると思われる（放置するとメモリやばそう）
                 // この辺ちゃんと仕様わかってないので、リファクタリング時に修正する
-                if (trapNumber > 0) {
-                    viewModel.skillTime.observe(viewLifecycleOwner) { skillTime ->
+                viewModel.skillTime.observe(viewLifecycleOwner) { skillTime ->
+                    if (skillTime != null) {
                         viewModel.compareSkillTime(userLive[userLive.size-1].relativeTime,
                             skillTime
                         )
@@ -217,11 +175,6 @@ class MainFragment: Fragment() {
                     }
                 }
             }
-        }
-
-        // Trap情報の監視
-        viewModel.allTrapsLive.observe(viewLifecycleOwner) {
-            Log.d("TRAP_LIVE", it.toString())
         }
 
         viewModel.limitTime.observe(viewLifecycleOwner) {
@@ -254,7 +207,6 @@ class MainFragment: Fragment() {
                 viewModel.setSkillTime(it)
             }
             viewModel.setIsOverSkillTime(false)
-            trapNumber += 1
         }
 
         viewModel.isOverSkillTime.observe(viewLifecycleOwner) {
