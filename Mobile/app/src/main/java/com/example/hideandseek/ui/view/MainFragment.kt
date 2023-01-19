@@ -40,9 +40,6 @@ class MainFragment: Fragment() {
         
         // Viewの取得
         // 時間表示の場所
-        val ivTime:           ImageView = binding.ivTime
-        val tvNow:            TextView  = binding.tvNow
-        val tvLimit:          TextView  = binding.tvLimit
         val tvRelativeTime:   TextView  = binding.tvRelativeTime
         val tvLimitTime:      TextView  = binding.tvLimitTime
         // Map
@@ -81,6 +78,7 @@ class MainFragment: Fragment() {
         }
 
         // User normal
+        // TODO: Statusを受け取って表示が切り替わるようにする
         val user1Normal:      ImageView = binding.user1Normal
         val user2Normal:      ImageView = binding.user2Normal
         val user3Normal:      ImageView = binding.user3Normal
@@ -88,26 +86,6 @@ class MainFragment: Fragment() {
         val user4Demon:       ImageView = binding.user4Demon
         // User captured
         val user1Captured:    ImageView = binding.user1Captured
-
-        fun changeOtherResultDialog(visibility: Int) {
-            ivTime.visibility         = visibility
-            tvNow.visibility          = visibility
-            tvLimit.visibility        = visibility
-            tvRelativeTime.visibility = visibility
-            tvLimitTime.visibility    = visibility
-            user1Normal.visibility    = visibility
-            user2Normal.visibility    = visibility
-            user3Normal.visibility    = visibility
-            user4Demon.visibility     = visibility
-            user1Captured.visibility  = visibility
-            btSkillOn.visibility      = visibility
-            btSkillOff.visibility     = visibility
-            progressSkill.visibility  = visibility
-
-            btCaptureOn.visibility      = visibility
-            btCaptureOff.visibility     = visibility
-        }
-
 
         // データベースからデータを持ってくる
         context?.let {
@@ -217,11 +195,6 @@ class MainFragment: Fragment() {
                     }
                 }
             }
-        }
-
-        // Trap情報の監視
-        viewModel.allTrapsLive.observe(viewLifecycleOwner) {
-            Log.d("TRAP_LIVE", it.toString())
         }
 
         viewModel.limitTime.observe(viewLifecycleOwner) {
