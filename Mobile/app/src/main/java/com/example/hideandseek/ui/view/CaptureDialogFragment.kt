@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.FragmentCaptureDialogBinding
 
@@ -32,13 +33,23 @@ class CaptureDialogFragment: DialogFragment() {
         val btCaptureYes:   ImageView = binding.btCaptureYes
         val btCaptureNo:    ImageView = binding.btCaptureNo
 
+        var flag: Boolean = false
+
         btCaptureYes.setOnClickListener {
-            // TODO: 観戦モードに移動する
+            flag = true
             dialog?.dismiss()
         }
 
         btCaptureNo.setOnClickListener {
             dialog?.dismiss()
+        }
+
+        dialog?.setOnDismissListener {
+            if (flag) {
+                val notifyCaptureDialogFragment = NotifyCaptureDialogFragment()
+                val supportFragmentManager = childFragmentManager
+                notifyCaptureDialogFragment.show(supportFragmentManager, "notifyCapture")
+            }
         }
 
         return root
