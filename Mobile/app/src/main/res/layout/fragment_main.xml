@@ -187,16 +187,6 @@
         android:src="@drawable/user04_oni"/>
 
     <ImageView
-        android:id="@+id/iv_watching"
-        android:layout_width="wrap_content"
-        android:layout_height="80dp"
-        app:layout_constraintBottom_toTopOf="@+id/bt_capture_off"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="invisible"
-        android:src="@drawable/text_watching"/>
-
-    <ImageView
         android:id="@+id/bt_capture_on"
         android:layout_width="200dp"
         android:layout_height="100dp"
