@@ -15,6 +15,8 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
+import com.example.hideandseek.data.datasource.local.LocationData
+import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.repository.UserRepository
 import com.example.hideandseek.databinding.FragmentBeTrappedBinding
 import com.example.hideandseek.ui.viewmodel.BeTrappedFragmentViewModel
@@ -60,6 +62,11 @@ class BeTrappedFragment: Fragment() {
             }
         }
 
+        // 2重LiveData解消のために変数定義
+        var limitTime: String = ""
+        var skillTime: String = ""
+        var trapTime:  String = ""
+
         // Trapが解除されるまでのプログレスバー
         val progressTrap:     ProgressBar = binding.progressTrap
         progressTrap.max = 60
@@ -69,7 +76,7 @@ class BeTrappedFragment: Fragment() {
             Log.d("limitTimeResultListener", result.toString())
             tvLimitTime.text = result
             if (result != null) {
-                viewModel.setLimitTime(result)
+                limitTime = result
             }
         }
 
@@ -77,7 +84,7 @@ class BeTrappedFragment: Fragment() {
             val result = bundle.getString("trapTime")
             Log.d("trapTimeResultListener", result.toString())
             if (result != null) {
-                viewModel.setTrapTime(result)
+                trapTime = result
             }
         }
 
@@ -95,6 +102,10 @@ class BeTrappedFragment: Fragment() {
             viewModel.setIsOverSkillTime(result)
         }
 
+        viewModel.skillTime.observe(viewLifecycleOwner) {
+            skillTime = it
+        }
+
         // データベースからデータを持ってくる
         context?.let {
             viewModel.setUserLive(it)
@@ -106,32 +117,25 @@ class BeTrappedFragment: Fragment() {
             if (userLive.isNotEmpty()) {
                 tvRelativeTime.text = userLive[userLive.size-1].relativeTime
                 // 制限時間になったかどうかの判定
-                viewModel.limitTime.observe(viewLifecycleOwner) { limitTime ->
-                    viewModel.compareTime(userLive[userLive.size-1].relativeTime, limitTime)
-                }
-
+                viewModel.compareTime(userLive[userLive.size-1].relativeTime, limitTime)
 
                 // trapにかかっている時間を計測
-                viewModel.trapTime.observe(viewLifecycleOwner) { trapTime ->
-                    viewModel.compareTrapTime(userLive[userLive.size-1].relativeTime, trapTime)
-                    val howProgressTrap = viewModel.howProgressTrapTime(userLive[userLive.size-1].relativeTime, trapTime)
-                    progressTrap.progress = howProgressTrap
-                }
+                viewModel.compareTrapTime(userLive[userLive.size-1].relativeTime, trapTime)
+                val howProgressTrap = viewModel.howProgressTrapTime(userLive[userLive.size-1].relativeTime, trapTime)
+                progressTrap.progress = howProgressTrap
 
                 // Skill Buttonの Progress Bar
                 // スキルボタンを複数回押したとき、relativeが一旦最初の(skillTime+1)秒になって、本来のrelativeまで1秒ずつ足される
                 // observeを二重にしてるせいで変な挙動していると思われる（放置するとメモリやばそう）
                 // この辺ちゃんと仕様わかってないので、リファクタリング時に修正する
-                viewModel.skillTime.observe(viewLifecycleOwner) { skillTime ->
-                    if (skillTime != null) {
-                        viewModel.compareSkillTime(userLive[userLive.size-1].relativeTime,
-                            skillTime
-                        )
-                        progressSkill.progress = viewModel.howProgressSkillTime(userLive[userLive.size-1].relativeTime,
-                            skillTime
-                        )
-                        setFragmentResult("BeTrappedFragmentSkillTime", bundleOf("skillTime" to skillTime))
-                    }
+                if (skillTime != "") {
+                    viewModel.compareSkillTime(userLive[userLive.size-1].relativeTime,
+                        skillTime
+                    )
+                    progressSkill.progress = viewModel.howProgressSkillTime(userLive[userLive.size-1].relativeTime,
+                        skillTime
+                    )
+                    setFragmentResult("BeTrappedFragmentSkillTime", bundleOf("skillTime" to skillTime))
                 }
             }
         }

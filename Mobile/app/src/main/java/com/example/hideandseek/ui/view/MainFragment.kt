@@ -15,6 +15,8 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
+import com.example.hideandseek.data.datasource.local.LocationData
+import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.repository.UserRepository
 import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModel
@@ -96,6 +98,29 @@ class MainFragment: Fragment() {
             viewModel.setIsOverSkillTime(result)
         }
 
+        // 2重LiveData解消のために変数定義
+        var allLocation: List<LocationData> = listOf()
+        var allTraps: List<TrapData> = listOf()
+        var limitTime: String = ""
+        var skillTime: String = ""
+
+        viewModel.allLocationsLive.observe(viewLifecycleOwner) {
+            allLocation = it
+        }
+
+        viewModel.allTrapsLive.observe(viewLifecycleOwner) {
+            allTraps = it
+        }
+
+        viewModel.limitTime.observe(viewLifecycleOwner) {
+            tvLimitTime.text = it
+            limitTime = it
+        }
+
+        viewModel.skillTime.observe(viewLifecycleOwner) {
+            skillTime = it
+        }
+
         // 自分の情報の表示
         viewModel.userLive.observe(viewLifecycleOwner) { userLive ->
             Log.d("UserLive", userLive.toString())
@@ -103,10 +128,8 @@ class MainFragment: Fragment() {
                 viewModel.setLimitTime(userLive[0].relativeTime)
                 tvRelativeTime.text = userLive[userLive.size-1].relativeTime
                 // 制限時間になったかどうかの判定
-                viewModel.limitTime.observe(viewLifecycleOwner) { limitTime ->
-                    viewModel.compareTime(userLive[userLive.size-1].relativeTime, limitTime)
-                    setFragmentResult("MainFragmentLimitTime", bundleOf("limitTime" to limitTime))
-                }
+                viewModel.compareTime(userLive[userLive.size-1].relativeTime, limitTime)
+                setFragmentResult("MainFragmentLimitTime", bundleOf("limitTime" to limitTime))
 
                 // 自分の位置情報のurl
                 val iconUrlHide = "https://onl.bz/dcMZVEa"
@@ -118,33 +141,30 @@ class MainFragment: Fragment() {
                         "&markers=icon:" + iconUrlHide + "|${userLive[userLive.size-1].latitude},${userLive[userLive.size-1].longitude}"
 
                 // 他人の位置を追加
-                viewModel.allLocationsLive.observe(viewLifecycleOwner) { allLocationLive ->
-                    Log.d("ALL_Location", allLocationLive.toString())
-                    if (allLocationLive.isNotEmpty()) {
-                        // ユーザーの位置情報
-                        for (i in allLocationLive.indices) {
-                            if (allLocationLive[i].objId == 1) {
-                                context?.let { context -> viewModel.postTrapRoom(context, 1) }
-                            } else {
-                                url += "&markers=icon:" + iconUrlHide + "|${allLocationLive[i].latitude},${allLocationLive[i].longitude}"
-                            }
+                Log.d("ALL_Location", allLocation.toString())
+                if (allLocation.isNotEmpty()) {
+                    // ユーザーの位置情報
+                    for (i in allLocation.indices) {
+                        if (allLocation[i].objId == 1) {
+                            context?.let { context -> viewModel.postTrapRoom(context, 1) }
+                        } else {
+                            url += "&markers=icon:" + iconUrlHide + "|${allLocation[i].latitude},${allLocation[i].longitude}"
                         }
                     }
                 }
 
-                // trapの位置情報
-                viewModel.allTrapsLive.observe(viewLifecycleOwner) { allTrap ->
-                    if (allTrap.isNotEmpty()) {
-                        for (i in allTrap.indices) {
-                            if (allTrap[i].objId == 0) {
-                                url += "&markers=icon:https://onl.bz/FetpS7Y|${allTrap[i].latitude},${allTrap[i].longitude}"
-                            }
-                            if (viewModel.checkCaughtTrap(userLive[userLive.size-1], allTrap[i])) {
-                                // TrapにかかったらFragmentを移動
-                                setFragmentResult("MainFragmentTrapTime", bundleOf("trapTime" to userLive[userLive.size-1].relativeTime))
 
-                                findNavController().navigate(R.id.navigation_be_trapped)
-                            }
+                // trapの位置情報
+                if (allTraps.isNotEmpty()) {
+                    for (i in allTraps.indices) {
+                        if (allTraps[i].objId == 0) {
+                            url += "&markers=icon:https://onl.bz/FetpS7Y|${allTraps[i].latitude},${allTraps[i].longitude}"
+                        }
+                        if (viewModel.checkCaughtTrap(userLive[userLive.size-1], allTraps[i])) {
+                            // TrapにかかったらFragmentを移動
+                            setFragmentResult("MainFragmentTrapTime", bundleOf("trapTime" to userLive[userLive.size-1].relativeTime))
+
+                            findNavController().navigate(R.id.navigation_be_trapped)
                         }
                     }
                 }
@@ -153,16 +173,14 @@ class MainFragment: Fragment() {
                 // スキルボタンを複数回押したとき、relativeが一旦最初の(skillTime+1)秒になって、本来のrelativeまで1秒ずつ足される
                 // observeを二重にしてるせいで変な挙動していると思われる（放置するとメモリやばそう）
                 // この辺ちゃんと仕様わかってないので、リファクタリング時に修正する
-                viewModel.skillTime.observe(viewLifecycleOwner) { skillTime ->
-                    if (skillTime != null) {
-                        viewModel.compareSkillTime(userLive[userLive.size-1].relativeTime,
-                            skillTime
-                        )
-                        progressSkill.progress = viewModel.howProgressSkillTime(userLive[userLive.size-1].relativeTime,
-                            skillTime
-                        )
-                        setFragmentResult("MainFragmentSkillTime", bundleOf("skillTime" to skillTime))
-                    }
+                if (skillTime != "") {
+                    viewModel.compareSkillTime(userLive[userLive.size-1].relativeTime,
+                        skillTime
+                    )
+                    progressSkill.progress = viewModel.howProgressSkillTime(userLive[userLive.size-1].relativeTime,
+                        skillTime
+                    )
+                    setFragmentResult("MainFragmentSkillTime", bundleOf("skillTime" to skillTime))
                 }
 
                 // URLから画像を取得
@@ -175,10 +193,6 @@ class MainFragment: Fragment() {
                     }
                 }
             }
-        }
-
-        viewModel.limitTime.observe(viewLifecycleOwner) {
-            tvLimitTime.text = it
         }
 
         viewModel.isOverLimitTime.observe(viewLifecycleOwner) {
