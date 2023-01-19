@@ -23,15 +23,13 @@ class BeTrappedFragment: Fragment() {
     private var _binding: FragmentBeTrappedBinding? = null
     private val viewModel: BeTrappedFragmentViewModel by viewModels()
 
-    private var trapNumber = 0
-
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentBeTrappedBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -66,7 +64,7 @@ class BeTrappedFragment: Fragment() {
         val progressTrap:     ProgressBar = binding.progressTrap
         progressTrap.max = 60
 
-        setFragmentResultListener("MainFragmentLimitTime") {key, bundle ->
+        setFragmentResultListener("MainFragmentLimitTime") {_, bundle ->
             val result = bundle.getString("limitTime")
             Log.d("limitTimeResultListener", result.toString())
             tvLimitTime.text = result
@@ -75,7 +73,7 @@ class BeTrappedFragment: Fragment() {
             }
         }
 
-        setFragmentResultListener("MainFragmentTrapTime") {key, bundle ->
+        setFragmentResultListener("MainFragmentTrapTime") {_, bundle ->
             val result = bundle.getString("trapTime")
             Log.d("trapTimeResultListener", result.toString())
             if (result != null) {
@@ -83,13 +81,7 @@ class BeTrappedFragment: Fragment() {
             }
         }
 
-        setFragmentResultListener("MainFragmentTrapNumber") {key, bundle ->
-            val result = bundle.getInt("trapNumber")
-            Log.d("trapNumberResultListener", result.toString())
-            trapNumber = result
-        }
-
-        setFragmentResultListener("MainFragmentSkillTime") {key, bundle ->
+        setFragmentResultListener("MainFragmentSkillTime") {_, bundle ->
             val result = bundle.getString("skillTime")
             Log.d("skillTimeResultListener", result.toString())
             if (result != null) {
@@ -97,7 +89,7 @@ class BeTrappedFragment: Fragment() {
             }
         }
 
-        setFragmentResultListener("MainFragmentIsOverSkillTime") {key, bundle ->
+        setFragmentResultListener("MainFragmentIsOverSkillTime") {_, bundle ->
             val result = bundle.getBoolean("isOverSkillTime")
             Log.d("isOverSKillTimeResultListener", result.toString())
             viewModel.setIsOverSkillTime(result)
@@ -130,8 +122,8 @@ class BeTrappedFragment: Fragment() {
                 // スキルボタンを複数回押したとき、relativeが一旦最初の(skillTime+1)秒になって、本来のrelativeまで1秒ずつ足される
                 // observeを二重にしてるせいで変な挙動していると思われる（放置するとメモリやばそう）
                 // この辺ちゃんと仕様わかってないので、リファクタリング時に修正する
-                if (trapNumber > 0) {
-                    viewModel.skillTime.observe(viewLifecycleOwner) { skillTime ->
+                viewModel.skillTime.observe(viewLifecycleOwner) { skillTime ->
+                    if (skillTime != null) {
                         viewModel.compareSkillTime(userLive[userLive.size-1].relativeTime,
                             skillTime
                         )
@@ -161,7 +153,6 @@ class BeTrappedFragment: Fragment() {
                 viewModel.setSkillTime(it)
             }
             viewModel.setIsOverSkillTime(false)
-            trapNumber += 1
         }
 
         viewModel.isOverSkillTime.observe(viewLifecycleOwner) {
@@ -172,7 +163,6 @@ class BeTrappedFragment: Fragment() {
         viewModel.isOverTrapTime.observe(viewLifecycleOwner) {
             // TrapTimeが終われば、もとのFragmentに戻る
             if (it) {
-                setFragmentResult("BeTrappedFragmentTrapNumber", bundleOf("trapNumber" to trapNumber))
                 findNavController().navigate(R.id.navigation_main)
             }
         }
