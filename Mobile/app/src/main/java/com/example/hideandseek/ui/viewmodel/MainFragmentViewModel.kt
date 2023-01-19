@@ -2,10 +2,7 @@ package com.example.hideandseek.ui.viewmodel
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.location.Location
 import android.util.Log
-import androidx.core.os.bundleOf
-import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.*
 import com.example.hideandseek.data.datasource.remote.PostData
@@ -13,7 +10,6 @@ import com.example.hideandseek.data.repository.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalTime
 import kotlin.math.abs
 
 class MainFragmentViewModel: ViewModel() {
