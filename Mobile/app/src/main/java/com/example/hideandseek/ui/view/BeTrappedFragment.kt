@@ -18,7 +18,6 @@ import com.example.hideandseek.R
 import com.example.hideandseek.data.repository.UserRepository
 import com.example.hideandseek.databinding.FragmentBeTrappedBinding
 import com.example.hideandseek.ui.viewmodel.BeTrappedFragmentViewModel
-import kotlinx.coroutines.launch
 
 class BeTrappedFragment: Fragment() {
     private var _binding: FragmentBeTrappedBinding? = null

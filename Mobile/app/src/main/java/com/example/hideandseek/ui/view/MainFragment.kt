@@ -1,16 +1,10 @@
 package com.example.hideandseek.ui.view
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.media.Image
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -19,21 +13,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
-import com.example.hideandseek.data.datasource.local.TrapData
-import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.repository.UserRepository
 import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import java.net.URL
-import kotlin.math.log
 
 class MainFragment: Fragment() {
     private var _binding: FragmentMainBinding? = null
