@@ -11,4 +11,10 @@
         android:label="Main"
         tools:layout="@layout/fragment_main"/>
 
+    <fragment
+        android:id="@+id/navigation_be_trapped"
+        android:name="com.example.hideandseek.ui.view.BeTrappedFragment"
+        android:label="BeTrapped"
+        tools:layout="@layout/fragment_be_trapped"/>
+
 </navigation>
