@@ -14,64 +14,12 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <ImageView
-        android:id="@+id/iv_time"
-        android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        app:srcCompat="@drawable/text_times"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="@string/description_time" />
-
-    <TextView
-        android:id="@+id/tv_now"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:text="NOW"
-        android:layout_marginStart="40dp"
-        app:layout_constraintTop_toTopOf="@id/iv_time"
-        app:layout_constraintBottom_toBottomOf="@id/iv_time"
-        app:layout_constraintStart_toStartOf="@id/iv_time"/>
-
-    <TextView
-        android:id="@+id/tv_relative_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:layout_marginStart="12dp"
-        app:layout_constraintBottom_toBottomOf="@id/tv_now"
-        app:layout_constraintStart_toEndOf="@id/tv_now"/>
-
-    <TextView
-        android:id="@+id/tv_limit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:text="LIMIT"
-        android:textColor="#F26363"
-        android:layout_marginEnd="12dp"
-        app:layout_constraintBottom_toBottomOf="@id/tv_now"
-        app:layout_constraintEnd_toStartOf="@+id/tv_limit_time"/>
-
-    <TextView
-        android:id="@+id/tv_limit_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textColor="#F26363"
-        android:layout_marginEnd="40dp"
-        app:layout_constraintBottom_toBottomOf="@id/tv_now"
-        app:layout_constraintEnd_toEndOf="@id/iv_time"/>
-
-    <ImageView
         android:id="@+id/iv_watching"
         android:layout_width="wrap_content"
         android:layout_height="80dp"
         app:layout_constraintBottom_toTopOf="@+id/bt_capture_off"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="invisible"
         android:src="@drawable/text_watching"/>
 
     <ImageView
@@ -81,7 +29,6 @@
         app:srcCompat="@drawable/button_captured_off"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="invisible"
         android:contentDescription="@string/description_capture_button" />
 
     <ImageView
@@ -90,25 +37,13 @@
         android:layout_height="100dp"
         app:srcCompat="@drawable/button_skill_off"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"/>
-
-    <ImageView
-        android:id="@+id/user1_normal"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:src="@drawable/user01_runaway"
-        android:layout_marginTop="-10dp"
-        android:layout_marginStart="40dp"
-        app:layout_constraintTop_toBottomOf="@+id/iv_time"
-        app:layout_constraintStart_toStartOf="parent"/>
 
     <ImageView
         android:id="@+id/user1_captured"
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:src="@drawable/user01_caputure"
-        android:visibility="invisible"
         android:layout_marginTop="-10dp"
         android:layout_marginStart="40dp"
         app:layout_constraintTop_toBottomOf="@+id/iv_time"
@@ -119,8 +54,8 @@
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:src="@drawable/user02_runaway"
-        app:layout_constraintTop_toTopOf="@+id/user1_normal"
-        app:layout_constraintStart_toEndOf="@+id/user1_normal"
+        app:layout_constraintTop_toTopOf="@+id/user1_captured"
+        app:layout_constraintStart_toEndOf="@+id/user1_captured"
         app:layout_constraintEnd_toStartOf="@+id/user3_normal"/>
 
     <ImageView
@@ -128,7 +63,7 @@
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:src="@drawable/user03_runaway"
-        app:layout_constraintTop_toTopOf="@+id/user1_normal"
+        app:layout_constraintTop_toTopOf="@+id/user1_captured"
         app:layout_constraintEnd_toStartOf="@+id/user4_demon"
         app:layout_constraintStart_toEndOf="@+id/user2_normal"/>
 
@@ -138,7 +73,7 @@
         android:layout_height="72dp"
         android:src="@drawable/user04_oni"
         android:layout_marginEnd="40dp"
-        app:layout_constraintTop_toTopOf="@+id/user1_normal"
+        app:layout_constraintTop_toTopOf="@+id/user1_captured"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

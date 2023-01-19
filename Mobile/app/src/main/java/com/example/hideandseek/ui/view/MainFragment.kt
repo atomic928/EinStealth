@@ -80,17 +80,6 @@ class MainFragment: Fragment() {
             }
         }
 
-        // 観戦中
-        val ivWatching:       ImageView = binding.ivWatching
-
-        // 捕まってステータスが捕まったになったら観戦モードになるkiwoj
-        fun changeStatusCaptured() {
-            ivWatching.visibility   = View.VISIBLE
-            changeBtCaptureVisible(false)
-            btSkillOff.visibility   = View.VISIBLE
-            btSkillOn.visibility    = View.INVISIBLE
-        }
-
         // User normal
         val user1Normal:      ImageView = binding.user1Normal
         val user2Normal:      ImageView = binding.user2Normal
@@ -309,8 +298,6 @@ class MainFragment: Fragment() {
         viewModel.map.observe(viewLifecycleOwner) {
             ivMap.setImageBitmap(it)
         }
-
-
 
         return root
     }

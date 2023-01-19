@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.FragmentNotifyCaptureDialogBinding
 
@@ -28,7 +29,7 @@ class NotifyCaptureDialogFragment: DialogFragment() {
         val btClose: ImageView = binding.btClose
 
         btClose.setOnClickListener {
-            // TODO: 観戦画面に移動する
+            findNavController().navigate(R.id.navigation_watch)
             dialog?.dismiss()
         }
 
