@@ -20,7 +20,6 @@ class WatchFragmentViewModel (
     val allLocationsLive = locationRepository.allLocations.asLiveData()
     val allTrapsLive = trapRepository.allTraps.asLiveData()
     val userLive = userRepository.allUsers.asLiveData()
-    private val repository = ApiRepository.instance
 
     private val _map = MutableLiveData<Bitmap>()
     val map: LiveData<Bitmap> = _map
@@ -39,7 +38,7 @@ class WatchFragmentViewModel (
     }
 
     suspend fun fetchMap(url: String): Bitmap {
-        return MapRepository().fetchMap(url)
+        return MapRepositoryImpl().fetchMap(url)
     }
 }
 

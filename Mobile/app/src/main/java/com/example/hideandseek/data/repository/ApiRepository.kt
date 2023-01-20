@@ -13,7 +13,17 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
-class ApiRepository {
+interface ApiRepository {
+    suspend fun getTest(): Response<ResponseData.ResponseGetTest>
+
+    suspend fun postStatus(id: Int, status: Int): Response<ResponseData.ResponsePost>
+
+    suspend fun getSpacetime(time: String): Response<List<ResponseData.ResponseGetSpacetime>>
+
+    suspend fun postSpacetime(request: PostData.PostSpacetime): Response<ResponseData.ResponsePost>
+}
+
+class ApiRepositoryImpl: ApiRepository {
     // 10秒でタイムアウトとなるように設定
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
@@ -28,25 +38,17 @@ class ApiRepository {
         .build()
         .create(RestApi::class.java)
 
-    suspend fun getTest(): Response<ResponseData.ResponseGetTest> =
+    override suspend fun getTest(): Response<ResponseData.ResponseGetTest> =
         service.getTest()
 
-    suspend fun postStatus(id: Int, status: Int): Response<ResponseData.ResponsePost> =
+    override suspend fun postStatus(id: Int, status: Int): Response<ResponseData.ResponsePost> =
         service.postStatus(id, status)
 
-    suspend fun getSpacetime(time: String): Response<List<ResponseData.ResponseGetSpacetime>> =
+    override suspend fun getSpacetime(time: String): Response<List<ResponseData.ResponseGetSpacetime>> =
         service.getSpacetime(time)
 
-    suspend fun postSpacetime(request: PostData.PostSpacetime): Response<ResponseData.ResponsePost> =
+    override suspend fun postSpacetime(request: PostData.PostSpacetime): Response<ResponseData.ResponsePost> =
         service.postSpacetime(request)
-
-
-    companion object Factory {
-        val instance: ApiRepository
-            @Synchronized get() {
-                return ApiRepository()
-            }
-    }
 
     private fun setBaseUrl(): String {
         return if (isEmulator()) {
