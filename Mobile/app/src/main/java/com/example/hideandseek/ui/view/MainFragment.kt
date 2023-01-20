@@ -14,7 +14,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.example.hideandseek.LocationApplication
+import com.example.hideandseek.MainApplication
 import com.example.hideandseek.R
 import com.example.hideandseek.data.datasource.local.LocationData
 import com.example.hideandseek.data.datasource.local.TrapData
@@ -27,7 +27,7 @@ import kotlinx.coroutines.*
 class MainFragment: Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val viewModel: MainFragmentViewModel by viewModels() {
-        MainFragmentViewModelFactory((activity?.application as LocationApplication).repository)
+        MainFragmentViewModelFactory((activity?.application as MainApplication).repository)
     }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)

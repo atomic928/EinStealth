@@ -13,7 +13,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.hideandseek.LocationApplication
+import com.example.hideandseek.MainApplication
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.ActivityMainBinding
 import com.example.hideandseek.ui.viewmodel.MainActivityViewModel
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var locationCallback: LocationCallback
 
     private val viewModel: MainActivityViewModel by viewModels() {
-        MainActivityViewModelFactory((application as LocationApplication).repository)
+        MainActivityViewModelFactory((application as MainApplication).repository)
     }
 
     private lateinit var binding: ActivityMainBinding
