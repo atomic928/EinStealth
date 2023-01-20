@@ -12,22 +12,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class WatchFragmentViewModel: ViewModel() {
-    lateinit var allLocationsLive: LiveData<List<LocationData>>
-    lateinit var allTrapsLive: LiveData<List<TrapData>>
-    lateinit var userLive: LiveData<List<UserData>>
-
-    fun setAllLocationsLive(context: Context) {
-        allLocationsLive = LocationRepository(context).allLocations.asLiveData()
-    }
-
-    fun setAllTrapsLive(context: Context) {
-        allTrapsLive = TrapRepository(context).allTraps.asLiveData()
-    }
-
-    fun setUserLive(context: Context) {
-        userLive = UserRepository(context).allUsers.asLiveData()
-    }
+class WatchFragmentViewModel (
+    private val locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
+    private val userRepository: UserRepository
+): ViewModel() {
+    val allLocationsLive = locationRepository.allLocations.asLiveData()
+    val allTrapsLive = trapRepository.allTraps.asLiveData()
+    val userLive = userRepository.allUsers.asLiveData()
 
     private val _map = MutableLiveData<Bitmap>()
     val map: LiveData<Bitmap> = _map
@@ -36,16 +28,30 @@ class WatchFragmentViewModel: ViewModel() {
         _map.value = p0
     }
 
-    fun postTrapRoom(context: Context, isMine: Int) = viewModelScope.launch {
+    fun postTrapRoom(isMine: Int) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
-            Log.d("USER_TRAP", UserRepository(context).nowUser.toString())
-            val nowUser = UserRepository(context).nowUser
+            Log.d("USER_TRAP", userRepository.getLatest().toString())
+            val nowUser = userRepository.getLatest()
             val trap = TrapData(0, nowUser.latitude, nowUser.longitude, nowUser.altitude, isMine)
-            TrapRepository(context).insert(trap)
+            trapRepository.insert(trap)
         }
     }
 
     suspend fun fetchMap(url: String): Bitmap {
         return MapRepositoryImpl().fetchMap(url)
+    }
+}
+
+class WatchFragmentViewModelFactory(
+    private val locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
+    private val userRepository: UserRepository
+): ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(WatchFragmentViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return WatchFragmentViewModel(locationRepository, trapRepository, userRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

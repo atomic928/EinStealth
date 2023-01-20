@@ -6,25 +6,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.example.hideandseek.R
+import com.example.hideandseek.MainApplication
 import com.example.hideandseek.data.datasource.local.LocationData
 import com.example.hideandseek.data.datasource.local.TrapData
-import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.databinding.FragmentWatchBinding
 import com.example.hideandseek.ui.viewmodel.WatchFragmentViewModel
+import com.example.hideandseek.ui.viewmodel.WatchFragmentViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class WatchFragment: Fragment() {
     private var _binding: FragmentWatchBinding? = null
-    private val viewModel: WatchFragmentViewModel by viewModels()
+    private val viewModel: WatchFragmentViewModel by viewModels {
+        WatchFragmentViewModelFactory(
+            (activity?.application as MainApplication).locationRepository,
+            (activity?.application as MainApplication).trapRepository,
+            (activity?.application as MainApplication).userRepository
+        )
+    }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
@@ -41,13 +43,6 @@ class WatchFragment: Fragment() {
         // Viewの取得
         // Map
         val ivMap: ImageView = binding.ivMap
-
-        // データベースからデータを持ってくる
-        context?.let {
-            viewModel.setAllLocationsLive(it)
-            viewModel.setUserLive(it)
-            viewModel.setAllTrapsLive(it)
-        }
 
         // 2重LiveData解消のために変数定義
         var allLocation: List<LocationData> = listOf()
@@ -80,7 +75,7 @@ class WatchFragment: Fragment() {
                     // ユーザーの位置情報
                     for (i in allLocation.indices) {
                         if (allLocation[i].objId == 1) {
-                            context?.let { context -> viewModel.postTrapRoom(context, 1) }
+                            viewModel.postTrapRoom(1)
                         } else {
                             url += "&markers=icon:" + iconUrlHide + "|${allLocation[i].latitude},${allLocation[i].longitude}"
                         }
