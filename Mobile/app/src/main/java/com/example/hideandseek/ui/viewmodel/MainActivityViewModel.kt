@@ -6,10 +6,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.datasource.remote.ResponseData
-import com.example.hideandseek.data.repository.ApiRepository
-import com.example.hideandseek.data.repository.LocationRepository
-import com.example.hideandseek.data.repository.TrapRepository
-import com.example.hideandseek.data.repository.UserRepository
+import com.example.hideandseek.data.repository.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,7 +16,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 class MainActivityViewModel: ViewModel() {
-    private val repository = ApiRepository.instance
+    private val repository = ApiRepositoryImpl()
 
     lateinit var relativeTime: LocalTime
 

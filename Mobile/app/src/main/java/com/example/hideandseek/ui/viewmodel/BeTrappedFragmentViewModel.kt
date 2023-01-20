@@ -7,6 +7,7 @@ import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.datasource.local.UserData
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.repository.ApiRepository
+import com.example.hideandseek.data.repository.ApiRepositoryImpl
 import com.example.hideandseek.data.repository.TrapRepository
 import com.example.hideandseek.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 class BeTrappedFragmentViewModel: ViewModel() {
     lateinit var userLive: LiveData<List<UserData>>
-    private val repository = ApiRepository.instance
+    private val repository = ApiRepositoryImpl()
 
     fun postTrapRoom(context: Context, isMine: Int) = viewModelScope.launch {
         withContext(Dispatchers.IO) {

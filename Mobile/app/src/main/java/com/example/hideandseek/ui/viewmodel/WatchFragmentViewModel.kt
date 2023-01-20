@@ -16,7 +16,6 @@ class WatchFragmentViewModel: ViewModel() {
     lateinit var allLocationsLive: LiveData<List<LocationData>>
     lateinit var allTrapsLive: LiveData<List<TrapData>>
     lateinit var userLive: LiveData<List<UserData>>
-    private val repository = ApiRepository.instance
 
     fun setAllLocationsLive(context: Context) {
         allLocationsLive = LocationRepository(context).allLocations.asLiveData()
