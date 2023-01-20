@@ -46,6 +46,6 @@ class WatchFragmentViewModel: ViewModel() {
     }
 
     suspend fun fetchMap(url: String): Bitmap {
-        return MapRepository().fetchMap(url)
+        return MapRepositoryImpl().fetchMap(url)
     }
 }
