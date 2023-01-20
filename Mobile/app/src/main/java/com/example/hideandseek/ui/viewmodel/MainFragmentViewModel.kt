@@ -12,15 +12,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
-class MainFragmentViewModel: ViewModel() {
-    lateinit var allLocationsLive: LiveData<List<LocationData>>
+class MainFragmentViewModel (private val locationRepository: LocationRepository): ViewModel() {
+    val allLocationsLive = locationRepository.allLocations.asLiveData()
     lateinit var allTrapsLive: LiveData<List<TrapData>>
     lateinit var userLive: LiveData<List<UserData>>
     private val repository = ApiRepository.instance
 
-    fun setAllLocationsLive(context: Context) {
-        allLocationsLive = LocationRepository(context).allLocations.asLiveData()
-    }
 
     fun setAllTrapsLive(context: Context) {
         allTrapsLive = TrapRepository(context).allTraps.asLiveData()
@@ -196,4 +193,15 @@ class MainFragmentViewModel: ViewModel() {
         return MapRepository().fetchMap(url)
     }
 }
+
+class MainFragmentViewModelFactory(private val locationRepository: LocationRepository): ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MainFragmentViewModel(locationRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
 

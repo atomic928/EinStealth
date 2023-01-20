@@ -18,7 +18,7 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-class MainActivityViewModel: ViewModel() {
+class MainActivityViewModel (private val locationRepository: LocationRepository): ViewModel() {
     private val repository = ApiRepository.instance
 
     lateinit var relativeTime: LocalTime
@@ -52,7 +52,7 @@ class MainActivityViewModel: ViewModel() {
             val user =
                 com.example.hideandseek.data.datasource.local.LocationData(0, relativeTime.toString().substring(0, 8), response[i].Latitude, response[i].Longtitude, response[i].Altitude, response[i].ObjId)
             withContext(Dispatchers.IO) {
-                LocationRepository(context).insert(user)
+                locationRepository.insert(user)
             }
         }
     }
@@ -92,7 +92,7 @@ class MainActivityViewModel: ViewModel() {
     // Locationデータベースのデータを全消去
     fun deleteAllLocation(context: Context) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
-            LocationRepository(context).deleteAll()
+            locationRepository.deleteAll()
         }
     }
 
@@ -106,5 +106,15 @@ class MainActivityViewModel: ViewModel() {
         withContext(Dispatchers.IO) {
             TrapRepository(context).deleteAll()
         }
+    }
+}
+
+class MainActivityViewModelFactory(private val locationRepository: LocationRepository): ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MainActivityViewModel(locationRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -14,17 +14,21 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.hideandseek.LocationApplication
 import com.example.hideandseek.R
 import com.example.hideandseek.data.datasource.local.LocationData
 import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.repository.UserRepository
 import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModel
+import com.example.hideandseek.ui.viewmodel.MainFragmentViewModelFactory
 import kotlinx.coroutines.*
 
 class MainFragment: Fragment() {
     private var _binding: FragmentMainBinding? = null
-    private val viewModel: MainFragmentViewModel by viewModels()
+    private val viewModel: MainFragmentViewModel by viewModels() {
+        MainFragmentViewModelFactory((activity?.application as LocationApplication).repository)
+    }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
@@ -78,7 +82,6 @@ class MainFragment: Fragment() {
 
         // データベースからデータを持ってくる
         context?.let {
-            viewModel.setAllLocationsLive(it)
             viewModel.setUserLive(it)
             viewModel.setAllTrapsLive(it)
         }
