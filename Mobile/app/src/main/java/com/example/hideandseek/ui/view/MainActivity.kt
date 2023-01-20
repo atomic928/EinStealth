@@ -13,9 +13,11 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.hideandseek.MainApplication
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.ActivityMainBinding
 import com.example.hideandseek.ui.viewmodel.MainActivityViewModel
+import com.example.hideandseek.ui.viewmodel.MainActivityViewModelFactory
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -33,7 +35,13 @@ class MainActivity : AppCompatActivity() {
     // 現在地を更新するためのコールバック
     private lateinit var locationCallback: LocationCallback
 
-    private val viewModel: MainActivityViewModel by viewModels()
+    private val viewModel: MainActivityViewModel by viewModels {
+        MainActivityViewModelFactory(
+            (application as MainApplication).locationRepository,
+            (application as MainApplication).trapRepository,
+            (application as MainApplication).userRepository
+        )
+    }
 
     private lateinit var binding: ActivityMainBinding
 
@@ -96,8 +104,8 @@ class MainActivity : AppCompatActivity() {
                     // 相対時間の初期化
                     viewModel.setUpRelativeTime(LocalTime.now())
                     // User情報の初期化はアプリの起動時にのみ行う
-                    viewModel.deleteAllUser(applicationContext)
-                    viewModel.deleteAllTrap(applicationContext)
+                    viewModel.deleteAllUser()
+                    viewModel.deleteAllTrap()
                     postCalculatedRelativeTime(location)
                 }
             }
@@ -143,12 +151,12 @@ class MainActivity : AppCompatActivity() {
         // 相対時間を計算
         viewModel.calculateRelativeTime(gap)
         // Roomに相対時間と座標を送る
-        viewModel.insertUser(viewModel.relativeTime, location, applicationContext)
+        viewModel.insertUser(viewModel.relativeTime, location)
         // 10秒おきにAPI通信をする
         if (viewModel.relativeTime.second%10 == 0) {
-            viewModel.deleteAllLocation(applicationContext)
+            viewModel.deleteAllLocation()
             viewModel.postSpacetime(viewModel.relativeTime, location)
-            viewModel.getSpacetime(viewModel.relativeTime, applicationContext)
+            viewModel.getSpacetime(viewModel.relativeTime)
         }
     }
 

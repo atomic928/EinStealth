@@ -1,19 +1,22 @@
 package com.example.hideandseek.data.repository
 
 import android.content.Context
+import androidx.annotation.WorkerThread
 import com.example.hideandseek.data.datasource.local.*
 import kotlinx.coroutines.flow.Flow
 
-class TrapRepository (private val context: Context) {
-
-    private val trapDao: TrapDao by lazy { TrapRoomDatabase.getInstance(context).trapDao() }
+class TrapRepository (private val trapDao: TrapDao) {
 
     val allTraps: Flow<List<TrapData>> = trapDao.getAll()
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
     suspend fun insert(trap: TrapData) {
         trapDao.insert(trap)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
     suspend fun deleteAll() {
         trapDao.deleteAll()
     }

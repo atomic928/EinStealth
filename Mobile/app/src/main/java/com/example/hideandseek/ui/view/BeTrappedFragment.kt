@@ -14,16 +14,28 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.hideandseek.MainApplication
 import com.example.hideandseek.R
 import com.example.hideandseek.data.datasource.local.LocationData
 import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.repository.UserRepository
 import com.example.hideandseek.databinding.FragmentBeTrappedBinding
 import com.example.hideandseek.ui.viewmodel.BeTrappedFragmentViewModel
+import com.example.hideandseek.ui.viewmodel.BeTrappedViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class BeTrappedFragment: Fragment() {
     private var _binding: FragmentBeTrappedBinding? = null
-    private val viewModel: BeTrappedFragmentViewModel by viewModels()
+    private val viewModel: BeTrappedFragmentViewModel by viewModels {
+        BeTrappedViewModelFactory(
+            (activity?.application as MainApplication).trapRepository,
+            (activity?.application as MainApplication).userRepository
+        )
+    }
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     private val binding get() = _binding!!
 
@@ -63,9 +75,9 @@ class BeTrappedFragment: Fragment() {
         }
 
         // 2重LiveData解消のために変数定義
-        var limitTime: String = ""
-        var skillTime: String = ""
-        var trapTime:  String = ""
+        var limitTime = ""
+        var skillTime = ""
+        var trapTime  = ""
 
         // Trapが解除されるまでのプログレスバー
         val progressTrap:     ProgressBar = binding.progressTrap
@@ -104,11 +116,6 @@ class BeTrappedFragment: Fragment() {
 
         viewModel.skillTime.observe(viewLifecycleOwner) {
             skillTime = it
-        }
-
-        // データベースからデータを持ってくる
-        context?.let {
-            viewModel.setUserLive(it)
         }
 
         // 自分の情報の表示
@@ -150,12 +157,12 @@ class BeTrappedFragment: Fragment() {
         // skillボタンが押された時の処理
         btSkillOn.setOnClickListener {
             // Userの最新情報から位置をとってきて、それを罠の位置とする
-            context?.let {
-                setFragmentResult("BeTrappedFragmentSkillTime", bundleOf("skillTime" to UserRepository(it).nowUser.relativeTime))
-                viewModel.postTrapRoom(it, 0)
-                viewModel.postTrapSpacetime(it)
-                viewModel.setSkillTime(it)
+            coroutineScope.launch {
+                setFragmentResult("BeTrappedFragmentSkillTime", bundleOf("skillTime" to viewModel.getNowUser().relativeTime))
             }
+            viewModel.postTrapRoom(0)
+            viewModel.postTrapSpacetime()
+            viewModel.setSkillTime()
             viewModel.setIsOverSkillTime(false)
         }
 

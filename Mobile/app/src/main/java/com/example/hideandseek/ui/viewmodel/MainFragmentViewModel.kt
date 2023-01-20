@@ -3,6 +3,8 @@ package com.example.hideandseek.ui.viewmodel
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.*
 import com.example.hideandseek.data.datasource.remote.PostData
@@ -12,43 +14,41 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
-class MainFragmentViewModel: ViewModel() {
-    lateinit var allLocationsLive: LiveData<List<LocationData>>
-    lateinit var allTrapsLive: LiveData<List<TrapData>>
-    lateinit var userLive: LiveData<List<UserData>>
+class MainFragmentViewModel (
+    private val locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
+    private val userRepository: UserRepository
+    ): ViewModel() {
+    val allLocationsLive = locationRepository.allLocations.asLiveData()
+    val allTrapsLive = trapRepository.allTraps.asLiveData()
+    val userLive = userRepository.allUsers.asLiveData()
     private val repository = ApiRepository.instance
 
-    fun setAllLocationsLive(context: Context) {
-        allLocationsLive = LocationRepository(context).allLocations.asLiveData()
+    suspend fun getNowUser(): UserData {
+        return userRepository.getLatest()
     }
 
-    fun setAllTrapsLive(context: Context) {
-        allTrapsLive = TrapRepository(context).allTraps.asLiveData()
-    }
-
-    fun postTrapRoom(context: Context, isMine: Int) = viewModelScope.launch {
+    fun postTrapRoom(isMine: Int) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
-            Log.d("USER_TRAP", UserRepository(context).nowUser.toString())
-            val nowUser = UserRepository(context).nowUser
+            Log.d("USER_TRAP", userRepository.getLatest().toString())
+            val nowUser = userRepository.getLatest()
             val trap = TrapData(0, nowUser.latitude, nowUser.longitude, nowUser.altitude, isMine)
-            TrapRepository(context).insert(trap)
+            trapRepository.insert(trap)
         }
     }
 
     private val _skillTime = MutableLiveData<String>()
     val skillTime: LiveData<String> = _skillTime
 
-    fun setSkillTime(context: Context) {
-        val nowUser = UserRepository(context).nowUser
-        _skillTime.value = nowUser.relativeTime
+    fun setSkillTime() = viewModelScope.launch{
+        withContext(Dispatchers.Main) {
+            val nowUser = userRepository.getLatest()
+            _skillTime.value = nowUser.relativeTime
+        }
     }
 
     fun setSkillTImeString(skillTime: String) {
         _skillTime.value = skillTime
-    }
-
-    fun setUserLive(context: Context) {
-        userLive = UserRepository(context).allUsers.asLiveData()
     }
 
     private val _limitTime = MutableLiveData<String>()
@@ -130,54 +130,9 @@ class MainFragmentViewModel: ViewModel() {
         _map.value = p0
     }
 
-    fun getTest() {
+    fun postTrapSpacetime() {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = repository.getTest()
-                if (response.isSuccessful) {
-                    Log.d("GETTEST", "${response}\n${response.body()}")
-                } else {
-                    Log.d("GETTEST", "$response")
-                }
-            } catch (e: java.lang.Exception){
-                Log.d("GETTEST", "$e")
-            }
-        }
-    }
-
-    fun postStatus(id: Int, status: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = repository.postStatus(id, status)
-                if (response.isSuccessful) {
-                    Log.d("GETTEST", "${response}\n${response.body()}")
-                } else {
-                    Log.d("GETTEST", "$response")
-                }
-            } catch (e: java.lang.Exception){
-                Log.d("GETTEST", "$e")
-            }
-        }
-    }
-
-    fun getSpacetime(time: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = repository.getSpacetime(time)
-                if (response.isSuccessful) {
-                    Log.d("GETTEST", "${response}\n${response.body()}")
-                } else {
-                    Log.d("GETTEST", "$response")
-                }
-            } catch (e: java.lang.Exception){
-                Log.d("GETTEST", "$e")
-            }
-        }
-    }
-
-    fun postTrapSpacetime(context: Context) {
-        val nowUser = UserRepository(context).nowUser
-        viewModelScope.launch(Dispatchers.IO) {
+            val nowUser = userRepository.getLatest()
             try {
                 val request = PostData.PostSpacetime(nowUser.relativeTime.substring(0, 7)+ "0", nowUser.latitude, nowUser.longitude, nowUser.altitude, 1)
                 val response = repository.postSpacetime(request)
@@ -196,4 +151,19 @@ class MainFragmentViewModel: ViewModel() {
         return MapRepository().fetchMap(url)
     }
 }
+
+class MainFragmentViewModelFactory(
+    private val locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
+    private val userRepository: UserRepository
+    ): ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MainFragmentViewModel(locationRepository, trapRepository, userRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
 

@@ -7,27 +7,25 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [UserData::class], version = 1, exportSchema = false)
-abstract class UserRoomDatabase: RoomDatabase(), ViewModelProvider.Factory {
+abstract class UserRoomDatabase: RoomDatabase() {
 
     abstract fun userDao() : UserDao
 
     companion object {
+        @Volatile
         private var INSTANCE: UserRoomDatabase? = null
 
-        private val lock = Any()
-
-        fun getInstance(context: Context): UserRoomDatabase {
-            synchronized(lock) {
-                if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(
-                        context.applicationContext,
-                        UserRoomDatabase::class.java,
-                        "user_db4"
-                    )
-                        .allowMainThreadQueries()
-                        .build()
-                }
-                return INSTANCE!!
+        fun getInstance(
+            context: Context
+        ): UserRoomDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    UserRoomDatabase::class.java,
+                    "user_db4"
+                ).build()
+                INSTANCE = instance
+                instance
             }
         }
     }

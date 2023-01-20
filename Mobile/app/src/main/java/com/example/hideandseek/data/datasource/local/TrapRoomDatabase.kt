@@ -7,27 +7,25 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [TrapData::class], version = 1, exportSchema = false)
-abstract class TrapRoomDatabase: RoomDatabase(), ViewModelProvider.Factory {
+abstract class TrapRoomDatabase: RoomDatabase() {
 
     abstract fun trapDao() : TrapDao
 
     companion object {
+        @Volatile
         private var INSTANCE: TrapRoomDatabase? = null
 
-        private val lock = Any()
-
-        fun getInstance(context: Context): TrapRoomDatabase {
-            synchronized(lock) {
-                if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(
-                        context.applicationContext,
-                        TrapRoomDatabase::class.java,
-                        "trap_db"
-                    )
-                        .allowMainThreadQueries()
-                        .build()
-                }
-                return INSTANCE!!
+        fun getInstance(
+            context: Context
+        ): TrapRoomDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    TrapRoomDatabase::class.java,
+                    "trap_db"
+                ).build()
+                INSTANCE = instance
+                instance
             }
         }
     }
