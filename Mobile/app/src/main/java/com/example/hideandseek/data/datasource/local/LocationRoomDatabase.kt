@@ -16,31 +16,15 @@ abstract class LocationRoomDatabase: RoomDatabase() {
         @Volatile
         private var INSTANCE: LocationRoomDatabase? = null
 
-//        private val lock = Any()
-
         fun getInstance(
             context: Context
         ): LocationRoomDatabase {
-//            synchronized(lock) {
-//                if (INSTANCE == null) {
-//                    INSTANCE = Room.databaseBuilder(
-//                        context.applicationContext,
-//                        LocationRoomDatabase::class.java,
-//                        "location_db"
-//                    )
-//                        .allowMainThreadQueries()
-//                        .build()
-//                }
-//                return INSTANCE!!
-//            }
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     LocationRoomDatabase::class.java,
                     "location_db"
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
+                ).build()
                 INSTANCE = instance
                 instance
             }

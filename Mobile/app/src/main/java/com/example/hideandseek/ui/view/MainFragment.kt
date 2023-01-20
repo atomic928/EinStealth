@@ -26,8 +26,12 @@ import kotlinx.coroutines.*
 
 class MainFragment: Fragment() {
     private var _binding: FragmentMainBinding? = null
-    private val viewModel: MainFragmentViewModel by viewModels() {
-        MainFragmentViewModelFactory((activity?.application as MainApplication).repository)
+    private val viewModel: MainFragmentViewModel by viewModels {
+        MainFragmentViewModelFactory(
+            (activity?.application as MainApplication).locationRepository,
+            (activity?.application as MainApplication).trapRepository,
+            (activity?.application as MainApplication).userRepository
+        )
     }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -80,12 +84,6 @@ class MainFragment: Fragment() {
         // User captured
         val user1Captured:    ImageView = binding.user1Captured
 
-        // データベースからデータを持ってくる
-        context?.let {
-            viewModel.setUserLive(it)
-            viewModel.setAllTrapsLive(it)
-        }
-
         // BeTrappedFragmentから戻ってきた時
         setFragmentResultListener("BeTrappedFragmentSkillTime") {_, bundle ->
             val result = bundle.getString("skillTime")
@@ -104,8 +102,8 @@ class MainFragment: Fragment() {
         // 2重LiveData解消のために変数定義
         var allLocation: List<LocationData> = listOf()
         var allTraps: List<TrapData> = listOf()
-        var limitTime: String = ""
-        var skillTime: String = ""
+        var limitTime = ""
+        var skillTime = ""
 
         viewModel.allLocationsLive.observe(viewLifecycleOwner) {
             allLocation = it
@@ -149,7 +147,7 @@ class MainFragment: Fragment() {
                     // ユーザーの位置情報
                     for (i in allLocation.indices) {
                         if (allLocation[i].objId == 1) {
-                            context?.let { context -> viewModel.postTrapRoom(context, 1) }
+                            viewModel.postTrapRoom(1)
                         } else {
                             url += "&markers=icon:" + iconUrlHide + "|${allLocation[i].latitude},${allLocation[i].longitude}"
                         }
@@ -217,12 +215,12 @@ class MainFragment: Fragment() {
         // skillボタンが押された時の処理
         btSkillOn.setOnClickListener {
             // Userの最新情報から位置をとってきて、それを罠の位置とする
-            context?.let {
-                setFragmentResult("MainFragmentSkillTime", bundleOf("skillTime" to UserRepository(it).nowUser.relativeTime))
-                viewModel.postTrapRoom(it, 0)
-                viewModel.postTrapSpacetime(it)
-                viewModel.setSkillTime(it)
+            coroutineScope.launch {
+                setFragmentResult("MainFragmentSkillTime", bundleOf("skillTime" to viewModel.getNowUser().relativeTime))
             }
+            viewModel.postTrapRoom(0)
+            viewModel.postTrapSpacetime()
+            viewModel.setSkillTime()
             viewModel.setIsOverSkillTime(false)
         }
 

@@ -1,6 +1,5 @@
 package com.example.hideandseek.ui.viewmodel
 
-import android.content.Context
 import android.location.Location
 import android.util.Log
 import androidx.lifecycle.*
@@ -18,7 +17,11 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-class MainActivityViewModel (private val locationRepository: LocationRepository): ViewModel() {
+class MainActivityViewModel (
+    private val locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
+    private val userRepository: UserRepository
+    ): ViewModel() {
     private val repository = ApiRepository.instance
 
     lateinit var relativeTime: LocalTime
@@ -39,15 +42,15 @@ class MainActivityViewModel (private val locationRepository: LocationRepository)
     }
 
     // ActivityからrelativeTimeとlocationを受け取り、Roomデータベースにuserデータとして送信
-    fun insertUser(relativeTime: LocalTime, location: Location, context: Context) = viewModelScope.launch {
+    fun insertUser(relativeTime: LocalTime, location: Location) = viewModelScope.launch {
         val user =
             com.example.hideandseek.data.datasource.local.UserData(0, relativeTime.toString().substring(0, 8), location.latitude, location.longitude, location.altitude)
         withContext(Dispatchers.IO) {
-            UserRepository(context).insert(user)
+            userRepository.insert(user)
         }
     }
 
-    private fun insertLocationAll(relativeTime: LocalTime, response: List<ResponseData.ResponseGetSpacetime>, context: Context) = viewModelScope.launch {
+    private fun insertLocationAll(relativeTime: LocalTime, response: List<ResponseData.ResponseGetSpacetime>) = viewModelScope.launch {
         for (i in response.indices) {
             val user =
                 com.example.hideandseek.data.datasource.local.LocationData(0, relativeTime.toString().substring(0, 8), response[i].Latitude, response[i].Longtitude, response[i].Altitude, response[i].ObjId)
@@ -73,13 +76,13 @@ class MainActivityViewModel (private val locationRepository: LocationRepository)
         }
     }
 
-    fun getSpacetime(relativeTime: LocalTime, context: Context) {
+    fun getSpacetime(relativeTime: LocalTime) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = repository.getSpacetime(relativeTime.toString().substring(0, 8))
                 if (response.isSuccessful) {
                     Log.d("GETTEST", "${response}\n${response.body()}")
-                    response.body()?.let { insertLocationAll(relativeTime, it, context) }
+                    response.body()?.let { insertLocationAll(relativeTime, it) }
                 } else {
                     Log.d("GETTEST", "$response")
                 }
@@ -90,30 +93,34 @@ class MainActivityViewModel (private val locationRepository: LocationRepository)
     }
 
     // Locationデータベースのデータを全消去
-    fun deleteAllLocation(context: Context) = viewModelScope.launch {
+    fun deleteAllLocation() = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             locationRepository.deleteAll()
         }
     }
 
-    fun deleteAllUser(context: Context) = viewModelScope.launch {
+    fun deleteAllUser() = viewModelScope.launch {
         withContext(Dispatchers.IO) {
-            UserRepository(context).deleteAll()
+            userRepository.deleteAll()
         }
     }
 
-    fun deleteAllTrap(context: Context) = viewModelScope.launch {
+    fun deleteAllTrap() = viewModelScope.launch {
         withContext(Dispatchers.IO) {
-            TrapRepository(context).deleteAll()
+            trapRepository.deleteAll()
         }
     }
 }
 
-class MainActivityViewModelFactory(private val locationRepository: LocationRepository): ViewModelProvider.Factory {
+class MainActivityViewModelFactory(
+    private val locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
+    private val userRepository: UserRepository
+    ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainActivityViewModel(locationRepository) as T
+            return MainActivityViewModel(locationRepository, trapRepository, userRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
