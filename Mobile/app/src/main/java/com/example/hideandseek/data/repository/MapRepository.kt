@@ -9,6 +9,8 @@ import java.net.URL
 
 interface MapRepository {
     suspend fun fetchMap(url: String): Bitmap
+
+    fun getOriginalBitmap(url: String): Bitmap
 }
 
 class MapRepositoryImpl: MapRepository {
@@ -22,7 +24,7 @@ class MapRepositoryImpl: MapRepository {
         return originalDeferred.await()
     }
 
-    private fun getOriginalBitmap(url: String): Bitmap =
+    override fun getOriginalBitmap(url: String): Bitmap =
         URL(url).openStream().use {
             BitmapFactory.decodeStream(it)
         }

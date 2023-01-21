@@ -12,7 +12,8 @@ import kotlinx.coroutines.withContext
 class WatchFragmentViewModel (
     locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val mapRepository: MapRepository
 ): ViewModel() {
     val allLocationsLive = locationRepository.allLocations.asLiveData()
     val allTrapsLive = trapRepository.allTraps.asLiveData()
@@ -35,19 +36,20 @@ class WatchFragmentViewModel (
     }
 
     suspend fun fetchMap(url: String): Bitmap {
-        return MapRepositoryImpl().fetchMap(url)
+        return mapRepository.fetchMap(url)
     }
 }
 
 class WatchFragmentViewModelFactory(
     private val locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val mapRepository: MapRepository
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WatchFragmentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return WatchFragmentViewModel(locationRepository, trapRepository, userRepository) as T
+            return WatchFragmentViewModel(locationRepository, trapRepository, userRepository, mapRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

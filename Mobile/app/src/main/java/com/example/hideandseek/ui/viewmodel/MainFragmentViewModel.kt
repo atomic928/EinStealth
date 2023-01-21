@@ -15,7 +15,8 @@ class MainFragmentViewModel (
     locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
-    private val apiRepository: ApiRepository
+    private val apiRepository: ApiRepository,
+    private val mapRepository: MapRepository
 ): ViewModel() {
     val allLocationsLive = locationRepository.allLocations.asLiveData()
     val allTrapsLive = trapRepository.allTraps.asLiveData()
@@ -145,7 +146,7 @@ class MainFragmentViewModel (
     }
 
     suspend fun fetchMap(url: String): Bitmap {
-        return MapRepositoryImpl().fetchMap(url)
+        return mapRepository.fetchMap(url)
     }
 }
 
@@ -153,12 +154,13 @@ class MainFragmentViewModelFactory(
     private val locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
-    private val apiRepository: ApiRepository
+    private val apiRepository: ApiRepository,
+    private val mapRepository: MapRepository
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainFragmentViewModel(locationRepository, trapRepository, userRepository, apiRepository) as T
+            return MainFragmentViewModel(locationRepository, trapRepository, userRepository, apiRepository, mapRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
