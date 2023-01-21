@@ -4,19 +4,30 @@ import androidx.annotation.WorkerThread
 import com.example.hideandseek.data.datasource.local.*
 import kotlinx.coroutines.flow.Flow
 
-class TrapRepository (private val trapDao: TrapDao) {
+interface TrapRepository {
+    val allTraps: Flow<List<TrapData>>
 
-    val allTraps: Flow<List<TrapData>> = trapDao.getAll()
+    suspend fun insert(trap: TrapData)
+
+    suspend fun deleteAll()
+}
+
+class TrapRepositoryImpl (
+    private val trapDao: TrapDao
+): TrapRepository {
+
+    override val allTraps: Flow<List<TrapData>>
+        get() = trapDao.getAll()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(trap: TrapData) {
+    override suspend fun insert(trap: TrapData) {
         trapDao.insert(trap)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun deleteAll() {
+    override suspend fun deleteAll() {
         trapDao.deleteAll()
     }
 }

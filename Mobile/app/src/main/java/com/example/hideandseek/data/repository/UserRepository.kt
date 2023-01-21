@@ -5,25 +5,38 @@ import com.example.hideandseek.data.datasource.local.UserDao
 import com.example.hideandseek.data.datasource.local.UserData
 import kotlinx.coroutines.flow.Flow
 
-class UserRepository (private val userDao: UserDao) {
+interface UserRepository {
+    val allUsers: Flow<List<UserData>>
 
-    val allUsers: Flow<List<UserData>> = userDao.getAll()
+    suspend fun getLatest(): UserData
+
+    suspend fun insert(user: UserData)
+
+    suspend fun deleteAll()
+}
+
+class UserRepositoryImpl (
+    private val userDao: UserDao
+): UserRepository {
+
+    override val allUsers: Flow<List<UserData>>
+        get() = userDao.getAll()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun getLatest(): UserData {
+    override suspend fun getLatest(): UserData {
         return userDao.getLatest()
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(user: UserData) {
+    override suspend fun insert(user: UserData) {
         userDao.insert(user)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun deleteAll() {
+    override suspend fun deleteAll() {
         userDao.deleteAll()
     }
 }
