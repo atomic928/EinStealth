@@ -7,6 +7,8 @@ import com.example.hideandseek.data.datasource.local.LocationRoomDatabase
 import com.example.hideandseek.data.datasource.local.TrapRoomDatabase
 import com.example.hideandseek.data.datasource.local.UserRoomDatabase
 import com.example.hideandseek.data.repository.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 
 class MainApplication: Application() {
     lateinit var container: AppContainer
@@ -17,12 +19,14 @@ class MainApplication: Application() {
 
     val mapRepository by lazy { MapRepositoryImpl() }
 
-    private val userDatabase by lazy { UserRoomDatabase.getInstance(this) }
+    private val applicationScope = CoroutineScope(SupervisorJob())
+
+    private val userDatabase by lazy { UserRoomDatabase.getInstance(this, applicationScope) }
     val userRepository by lazy { UserRepositoryImpl(userDatabase.userDao()) }
 
-    private val trapDatabase by lazy { TrapRoomDatabase.getInstance(this) }
+    private val trapDatabase by lazy { TrapRoomDatabase.getInstance(this, applicationScope) }
     val trapRepository by lazy { TrapRepositoryImpl(trapDatabase.trapDao()) }
 
-    private val locationDatabase by lazy { LocationRoomDatabase.getInstance(this) }
+    private val locationDatabase by lazy { LocationRoomDatabase.getInstance(this, applicationScope) }
     val locationRepository by lazy { LocationRepositoryImpl(locationDatabase.locationDao()) }
 }
