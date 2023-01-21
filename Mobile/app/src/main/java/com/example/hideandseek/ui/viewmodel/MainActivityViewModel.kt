@@ -63,12 +63,12 @@ class MainActivityViewModel (
                 val request = PostData.PostSpacetime(relativeTime.toString().substring(0, 8), location.latitude, location.longitude, location.altitude, 0)
                 val response = apiRepository.postSpacetime(request)
                 if (response.isSuccessful) {
-                    Log.d("POSTTEST", "${response}\n${response.body()}")
+                    Log.d("POST_TEST", "${response}\n${response.body()}")
                 } else {
-                    Log.d("POSTTEST", "$response")
+                    Log.d("POST_TEST", "$response")
                 }
             } catch (e: java.lang.Exception){
-                Log.d("POSTTEST", "$e")
+                Log.d("POST_TEST", "$e")
             }
         }
     }
@@ -78,13 +78,13 @@ class MainActivityViewModel (
             try {
                 val response = apiRepository.getSpacetime(relativeTime.toString().substring(0, 8))
                 if (response.isSuccessful) {
-                    Log.d("GETTEST", "${response}\n${response.body()}")
+                    Log.d("GET_TEST", "${response}\n${response.body()}")
                     response.body()?.let { insertLocationAll(relativeTime, it) }
                 } else {
-                    Log.d("GETTEST", "$response")
+                    Log.d("GET_TEST", "$response")
                 }
             } catch (e: java.lang.Exception){
-                Log.d("GETTEST", "$e")
+                Log.d("GET_TEST", "$e")
             }
         }
     }

@@ -1,19 +1,16 @@
 package com.example.hideandseek.ui.viewmodel
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.hideandseek.data.datasource.local.LocationData
 import com.example.hideandseek.data.datasource.local.TrapData
-import com.example.hideandseek.data.datasource.local.UserData
 import com.example.hideandseek.data.repository.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class WatchFragmentViewModel (
-    private val locationRepository: LocationRepository,
+    locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
     private val userRepository: UserRepository
 ): ViewModel() {

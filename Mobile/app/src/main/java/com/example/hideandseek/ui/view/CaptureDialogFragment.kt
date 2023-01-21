@@ -21,7 +21,7 @@ class CaptureDialogFragment: DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentCaptureDialogBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -29,7 +29,7 @@ class CaptureDialogFragment: DialogFragment() {
         val btCaptureYes:   ImageView = binding.btCaptureYes
         val btCaptureNo:    ImageView = binding.btCaptureNo
 
-        var flag: Boolean = false
+        var flag = false
 
         btCaptureYes.setOnClickListener {
             flag = true

@@ -22,7 +22,7 @@ class SuccessEscapeDialogFragment: DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentSuccessEscapeDialogBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
