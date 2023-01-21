@@ -1,10 +1,7 @@
 package com.example.hideandseek.ui.viewmodel
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.core.os.bundleOf
-import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.*
 import com.example.hideandseek.data.datasource.remote.PostData
@@ -15,14 +12,14 @@ import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
 class MainFragmentViewModel (
-    private val locationRepository: LocationRepository,
+    locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
-    ): ViewModel() {
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
+): ViewModel() {
     val allLocationsLive = locationRepository.allLocations.asLiveData()
     val allTrapsLive = trapRepository.allTraps.asLiveData()
     val userLive = userRepository.allUsers.asLiveData()
-    private val repository = ApiRepositoryImpl()
 
     suspend fun getNowUser(): UserData {
         return userRepository.getLatest()
@@ -56,24 +53,24 @@ class MainFragmentViewModel (
 
     // RelativeTime+15分の時間を制限時間とする
     fun setLimitTime(relativeTime: String) {
-        var limitTime = ""
+        val limitTime: String
         if (relativeTime.substring(3, 5).toInt() < 45) {
             limitTime = relativeTime.substring(0, 3) + (relativeTime.substring(3, 5).toInt()+15).toString() + relativeTime.substring(5)
         } else if (relativeTime.substring(3, 5).toInt() < 55) {
-            if (relativeTime.substring(0, 2).toInt() == 23) {
-                limitTime = "00:0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+            limitTime = if (relativeTime.substring(0, 2).toInt() == 23) {
+                "00:0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             } else if (relativeTime.substring(0, 2).toInt() >= 9) {
-                limitTime = (relativeTime.substring(0, 2).toInt()+1).toString()+":0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+                (relativeTime.substring(0, 2).toInt()+1).toString()+":0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             } else {
-                limitTime = "0"+(relativeTime.substring(0, 2).toInt()+1).toString()+":0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+                "0"+(relativeTime.substring(0, 2).toInt()+1).toString()+":0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             }
         } else {
-            if (relativeTime.substring(0, 2).toInt() == 23) {
-                limitTime = "00:"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+            limitTime = if (relativeTime.substring(0, 2).toInt() == 23) {
+                "00:"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             } else if (relativeTime.substring(0, 2).toInt() >= 9) {
-                limitTime = (relativeTime.substring(0, 2).toInt()+1).toString()+":"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+                (relativeTime.substring(0, 2).toInt()+1).toString()+":"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             } else {
-                limitTime = "0"+(relativeTime.substring(0, 2).toInt()+1).toString()+":"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+                "0"+(relativeTime.substring(0, 2).toInt()+1).toString()+":"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             }
         }
         _limitTime.value = limitTime
@@ -112,10 +109,10 @@ class MainFragmentViewModel (
 
     fun howProgressSkillTime(relativeTime: String, skillTime: String): Int {
         Log.d("HowProgress", ((60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60).toString())
-        if (relativeTime.substring(6).toInt() < skillTime.substring(6).toInt()) {
-            return (60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60
+        return if (relativeTime.substring(6).toInt() < skillTime.substring(6).toInt()) {
+            (60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60
         } else {
-            return relativeTime.substring(6).toInt()-skillTime.substring(6).toInt()
+            relativeTime.substring(6).toInt()-skillTime.substring(6).toInt()
         }
     }
 
@@ -135,14 +132,14 @@ class MainFragmentViewModel (
             val nowUser = userRepository.getLatest()
             try {
                 val request = PostData.PostSpacetime(nowUser.relativeTime.substring(0, 7)+ "0", nowUser.latitude, nowUser.longitude, nowUser.altitude, 1)
-                val response = repository.postSpacetime(request)
+                val response = apiRepository.postSpacetime(request)
                 if (response.isSuccessful) {
-                    Log.d("POSTTEST", "${response}\n${response.body()}")
+                    Log.d("POST_TEST", "${response}\n${response.body()}")
                 } else {
-                    Log.d("POSTTEST", "$response")
+                    Log.d("POST_TEST", "$response")
                 }
             } catch (e: java.lang.Exception){
-                Log.d("POSTTEST", "$e")
+                Log.d("POST_TEST", "$e")
             }
         }
     }
@@ -155,12 +152,13 @@ class MainFragmentViewModel (
 class MainFragmentViewModelFactory(
     private val locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
-    ): ViewModelProvider.Factory {
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
+): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainFragmentViewModel(locationRepository, trapRepository, userRepository) as T
+            return MainFragmentViewModel(locationRepository, trapRepository, userRepository, apiRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -36,7 +36,7 @@ class WatchFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentWatchBinding.inflate(inflater, container, false)
         val root: View = binding.root
 

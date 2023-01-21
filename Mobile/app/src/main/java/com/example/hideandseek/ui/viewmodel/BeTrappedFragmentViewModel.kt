@@ -1,13 +1,11 @@
 package com.example.hideandseek.ui.viewmodel
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.datasource.local.UserData
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.repository.ApiRepository
-import com.example.hideandseek.data.repository.ApiRepositoryImpl
 import com.example.hideandseek.data.repository.TrapRepository
 import com.example.hideandseek.data.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -16,10 +14,10 @@ import kotlinx.coroutines.withContext
 
 class BeTrappedFragmentViewModel (
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
     ): ViewModel() {
     val userLive = userRepository.allUsers.asLiveData()
-    private val repository = ApiRepositoryImpl()
 
     suspend fun getNowUser(): UserData {
         return userRepository.getLatest()
@@ -78,19 +76,19 @@ class BeTrappedFragmentViewModel (
 
     fun howProgressSkillTime(relativeTime: String, skillTime: String): Int {
         Log.d("HowProgress", ((60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60).toString())
-        if (relativeTime.substring(6).toInt() < skillTime.substring(6).toInt()) {
-            return (60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60
+        return if (relativeTime.substring(6).toInt() < skillTime.substring(6).toInt()) {
+            (60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60
         } else {
-            return relativeTime.substring(6).toInt()-skillTime.substring(6).toInt()
+            relativeTime.substring(6).toInt()-skillTime.substring(6).toInt()
         }
     }
 
     fun howProgressTrapTime(relativeTime: String, trapTime: String): Int {
         Log.d("HowProgressTrap", ((60+relativeTime.substring(6).toInt()-trapTime.substring(6).toInt())%60).toString())
-        if (relativeTime.substring(6).toInt() < trapTime.substring(6).toInt()) {
-            return (60+relativeTime.substring(6).toInt()-trapTime.substring(6).toInt())%60
+        return if (relativeTime.substring(6).toInt() < trapTime.substring(6).toInt()) {
+            (60+relativeTime.substring(6).toInt()-trapTime.substring(6).toInt())%60
         } else {
-            return relativeTime.substring(6).toInt()-trapTime.substring(6).toInt()
+            relativeTime.substring(6).toInt()-trapTime.substring(6).toInt()
         }
     }
 
@@ -103,14 +101,14 @@ class BeTrappedFragmentViewModel (
             val nowUser = userRepository.getLatest()
             try {
                 val request = PostData.PostSpacetime(nowUser.relativeTime.substring(0, 7)+ "0", nowUser.latitude, nowUser.longitude, nowUser.altitude, 1)
-                val response = repository.postSpacetime(request)
+                val response = apiRepository.postSpacetime(request)
                 if (response.isSuccessful) {
-                    Log.d("POSTTEST", "${response}\n${response.body()}")
+                    Log.d("POST_TEST", "${response}\n${response.body()}")
                 } else {
-                    Log.d("POSTTEST", "$response")
+                    Log.d("POST_TEST", "$response")
                 }
             } catch (e: java.lang.Exception){
-                Log.d("POSTTEST", "$e")
+                Log.d("POST_TEST", "$e")
             }
         }
     }
@@ -118,12 +116,13 @@ class BeTrappedFragmentViewModel (
 
 class BeTrappedViewModelFactory(
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(BeTrappedFragmentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return BeTrappedFragmentViewModel(trapRepository, userRepository) as T
+            return BeTrappedFragmentViewModel(trapRepository, userRepository, apiRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

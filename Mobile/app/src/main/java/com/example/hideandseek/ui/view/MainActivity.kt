@@ -39,7 +39,8 @@ class MainActivity : AppCompatActivity() {
         MainActivityViewModelFactory(
             (application as MainApplication).locationRepository,
             (application as MainApplication).trapRepository,
-            (application as MainApplication).userRepository
+            (application as MainApplication).userRepository,
+            (application as MainApplication).container.apiRepository
         )
     }
 

@@ -17,9 +17,9 @@ import kotlin.math.sqrt
 class MainActivityViewModel (
     private val locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
     ): ViewModel() {
-    private val repository = ApiRepositoryImpl()
 
     lateinit var relativeTime: LocalTime
 
@@ -61,14 +61,14 @@ class MainActivityViewModel (
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val request = PostData.PostSpacetime(relativeTime.toString().substring(0, 8), location.latitude, location.longitude, location.altitude, 0)
-                val response = repository.postSpacetime(request)
+                val response = apiRepository.postSpacetime(request)
                 if (response.isSuccessful) {
-                    Log.d("POSTTEST", "${response}\n${response.body()}")
+                    Log.d("POST_TEST", "${response}\n${response.body()}")
                 } else {
-                    Log.d("POSTTEST", "$response")
+                    Log.d("POST_TEST", "$response")
                 }
             } catch (e: java.lang.Exception){
-                Log.d("POSTTEST", "$e")
+                Log.d("POST_TEST", "$e")
             }
         }
     }
@@ -76,15 +76,15 @@ class MainActivityViewModel (
     fun getSpacetime(relativeTime: LocalTime) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = repository.getSpacetime(relativeTime.toString().substring(0, 8))
+                val response = apiRepository.getSpacetime(relativeTime.toString().substring(0, 8))
                 if (response.isSuccessful) {
-                    Log.d("GETTEST", "${response}\n${response.body()}")
+                    Log.d("GET_TEST", "${response}\n${response.body()}")
                     response.body()?.let { insertLocationAll(relativeTime, it) }
                 } else {
-                    Log.d("GETTEST", "$response")
+                    Log.d("GET_TEST", "$response")
                 }
             } catch (e: java.lang.Exception){
-                Log.d("GETTEST", "$e")
+                Log.d("GET_TEST", "$e")
             }
         }
     }
@@ -112,12 +112,13 @@ class MainActivityViewModel (
 class MainActivityViewModelFactory(
     private val locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
     ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainActivityViewModel(locationRepository, trapRepository, userRepository) as T
+            return MainActivityViewModel(locationRepository, trapRepository, userRepository, apiRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

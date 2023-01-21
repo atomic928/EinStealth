@@ -18,7 +18,6 @@ import com.example.hideandseek.MainApplication
 import com.example.hideandseek.R
 import com.example.hideandseek.data.datasource.local.LocationData
 import com.example.hideandseek.data.datasource.local.TrapData
-import com.example.hideandseek.data.repository.UserRepository
 import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModel
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModelFactory
@@ -30,7 +29,8 @@ class MainFragment: Fragment() {
         MainFragmentViewModelFactory(
             (activity?.application as MainApplication).locationRepository,
             (activity?.application as MainApplication).trapRepository,
-            (activity?.application as MainApplication).userRepository
+            (activity?.application as MainApplication).userRepository,
+            (activity?.application as MainApplication).container.apiRepository
         )
     }
 
