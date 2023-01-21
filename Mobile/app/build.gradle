@@ -80,6 +80,10 @@ dependencies {
     // Hilt
     implementation "com.google.dagger:hilt-android:2.44"
     kapt "com.google.dagger:hilt-compiler:2.44"
+
+    // Test
+    testImplementation 'junit.junit:4.13.2'
+    testImplementation 'org.jetbrains.kotlinx:ktolinx-coroutines-test:1.6.0'
 }
 
 // Allow references to generated code
