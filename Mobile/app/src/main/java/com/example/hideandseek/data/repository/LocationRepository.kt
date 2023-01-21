@@ -5,19 +5,30 @@ import com.example.hideandseek.data.datasource.local.LocationData
 import com.example.hideandseek.data.datasource.local.LocationDao
 import kotlinx.coroutines.flow.Flow
 
-class LocationRepository (private val locationDao: LocationDao) {
+interface LocationRepository {
+    val allLocations: Flow<List<LocationData>>
 
-    val allLocations: Flow<List<LocationData>> = locationDao.getAll()
+    suspend fun insert(location: LocationData)
+
+    suspend fun deleteAll()
+}
+
+class LocationRepositoryImpl (
+    private val locationDao: LocationDao
+): LocationRepository {
+
+    override val allLocations: Flow<List<LocationData>>
+        get() = locationDao.getAll()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(user: LocationData) {
+    override suspend fun insert(user: LocationData) {
         locationDao.insert(user)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun deleteAll() {
+    override suspend fun deleteAll() {
         locationDao.deleteAll()
     }
 }

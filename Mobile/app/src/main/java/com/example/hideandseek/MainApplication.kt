@@ -6,9 +6,7 @@ import com.example.hideandseek.data.AppContainerImpl
 import com.example.hideandseek.data.datasource.local.LocationRoomDatabase
 import com.example.hideandseek.data.datasource.local.TrapRoomDatabase
 import com.example.hideandseek.data.datasource.local.UserRoomDatabase
-import com.example.hideandseek.data.repository.LocationRepository
-import com.example.hideandseek.data.repository.TrapRepository
-import com.example.hideandseek.data.repository.UserRepository
+import com.example.hideandseek.data.repository.*
 
 class MainApplication: Application() {
     lateinit var container: AppContainer
@@ -18,11 +16,11 @@ class MainApplication: Application() {
     }
 
     private val userDatabase by lazy { UserRoomDatabase.getInstance(this) }
-    val userRepository by lazy { UserRepository(userDatabase.userDao()) }
+    val userRepository by lazy { UserRepositoryImpl(userDatabase.userDao()) }
 
     private val trapDatabase by lazy { TrapRoomDatabase.getInstance(this) }
-    val trapRepository by lazy { TrapRepository(trapDatabase.trapDao()) }
+    val trapRepository by lazy { TrapRepositoryImpl(trapDatabase.trapDao()) }
 
     private val locationDatabase by lazy { LocationRoomDatabase.getInstance(this) }
-    val locationRepository by lazy { LocationRepository(locationDatabase.locationDao()) }
+    val locationRepository by lazy { LocationRepositoryImpl(locationDatabase.locationDao()) }
 }
