@@ -82,9 +82,9 @@ func GetSpaceTimes(c *gin.Context) {
 
 	// 受け取ったものをJsonResponseに詰め直す
 	type JsonResponse struct {
-		Latitude  float32 `json:"latitude"`
-		Longitude float32 `json:"longitude"`
-		Altitude  float32 `json:"altitude"`
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+		Altitude  float64 `json:"altitude"`
 		ObjId     int     `json:"obj_id"` // 人: player_id, 罠: player_id*(-1)
 	}
 	jsonRes := make([]JsonResponse, len(res))
@@ -109,9 +109,9 @@ func PostSpaceTimes(c *gin.Context) {
 	// param取得
 	type JsonRequest struct {
 		Time      string  `json:"time"`
-		Latitude  float32 `json:"latitude"`
-		Longitude float32 `json:"longitude"`
-		Altitude  float32 `json:"altitude"`
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+		Altitude  float64 `json:"altitude"`
 		ObjId     int     `json:"obj_id"`
 	}
 	var req JsonRequest
