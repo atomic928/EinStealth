@@ -16,10 +16,10 @@ import kotlinx.coroutines.withContext
 
 class BeTrappedFragmentViewModel (
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
     ): ViewModel() {
     val userLive = userRepository.allUsers.asLiveData()
-    private val repository = ApiRepositoryImpl()
 
     suspend fun getNowUser(): UserData {
         return userRepository.getLatest()
@@ -103,7 +103,7 @@ class BeTrappedFragmentViewModel (
             val nowUser = userRepository.getLatest()
             try {
                 val request = PostData.PostSpacetime(nowUser.relativeTime.substring(0, 7)+ "0", nowUser.latitude, nowUser.longitude, nowUser.altitude, 1)
-                val response = repository.postSpacetime(request)
+                val response = apiRepository.postSpacetime(request)
                 if (response.isSuccessful) {
                     Log.d("POSTTEST", "${response}\n${response.body()}")
                 } else {
@@ -118,12 +118,13 @@ class BeTrappedFragmentViewModel (
 
 class BeTrappedViewModelFactory(
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(BeTrappedFragmentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return BeTrappedFragmentViewModel(trapRepository, userRepository) as T
+            return BeTrappedFragmentViewModel(trapRepository, userRepository, apiRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

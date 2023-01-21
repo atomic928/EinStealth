@@ -31,7 +31,8 @@ class BeTrappedFragment: Fragment() {
     private val viewModel: BeTrappedFragmentViewModel by viewModels {
         BeTrappedViewModelFactory(
             (activity?.application as MainApplication).trapRepository,
-            (activity?.application as MainApplication).userRepository
+            (activity?.application as MainApplication).userRepository,
+            (activity?.application as MainApplication).container.apiRepository
         )
     }
 

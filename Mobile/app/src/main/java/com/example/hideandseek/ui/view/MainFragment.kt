@@ -30,7 +30,8 @@ class MainFragment: Fragment() {
         MainFragmentViewModelFactory(
             (activity?.application as MainApplication).locationRepository,
             (activity?.application as MainApplication).trapRepository,
-            (activity?.application as MainApplication).userRepository
+            (activity?.application as MainApplication).userRepository,
+            (activity?.application as MainApplication).container.apiRepository
         )
     }
 

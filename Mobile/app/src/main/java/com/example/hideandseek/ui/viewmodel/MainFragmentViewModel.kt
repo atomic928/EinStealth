@@ -17,12 +17,12 @@ import kotlin.math.abs
 class MainFragmentViewModel (
     private val locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
-    ): ViewModel() {
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
+): ViewModel() {
     val allLocationsLive = locationRepository.allLocations.asLiveData()
     val allTrapsLive = trapRepository.allTraps.asLiveData()
     val userLive = userRepository.allUsers.asLiveData()
-    private val repository = ApiRepositoryImpl()
 
     suspend fun getNowUser(): UserData {
         return userRepository.getLatest()
@@ -135,7 +135,7 @@ class MainFragmentViewModel (
             val nowUser = userRepository.getLatest()
             try {
                 val request = PostData.PostSpacetime(nowUser.relativeTime.substring(0, 7)+ "0", nowUser.latitude, nowUser.longitude, nowUser.altitude, 1)
-                val response = repository.postSpacetime(request)
+                val response = apiRepository.postSpacetime(request)
                 if (response.isSuccessful) {
                     Log.d("POSTTEST", "${response}\n${response.body()}")
                 } else {
@@ -155,12 +155,13 @@ class MainFragmentViewModel (
 class MainFragmentViewModelFactory(
     private val locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository
-    ): ViewModelProvider.Factory {
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
+): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainFragmentViewModel(locationRepository, trapRepository, userRepository) as T
+            return MainFragmentViewModel(locationRepository, trapRepository, userRepository, apiRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
