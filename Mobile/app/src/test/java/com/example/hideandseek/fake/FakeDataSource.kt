@@ -1,5 +1,6 @@
 package com.example.hideandseek.fake
 
+import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.datasource.remote.ResponseData
 import retrofit2.Response
 
@@ -32,5 +33,13 @@ object FakeDataSource {
 
     val fakeResponsePost: Response<ResponseData.ResponsePost> = Response.success(
         fakePost
+    )
+
+    val fakePostSpacetime = PostData.PostSpacetime(
+        "00:00:00",
+        latitudeOne,
+        longitudeOne,
+        altitudeOne,
+        objIdOne
     )
 }
