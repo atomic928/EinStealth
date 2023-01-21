@@ -15,6 +15,8 @@ class MainApplication: Application() {
         container = AppContainerImpl()
     }
 
+    val mapRepository by lazy { MapRepositoryImpl() }
+
     private val userDatabase by lazy { UserRoomDatabase.getInstance(this) }
     val userRepository by lazy { UserRepositoryImpl(userDatabase.userDao()) }
 
