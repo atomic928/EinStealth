@@ -11,5 +11,5 @@ data class LocationData(
     @ColumnInfo(name = "latitude") val latitude: Double,
     @ColumnInfo(name = "longitude") val longitude: Double,
     @ColumnInfo(name = "altitude") val altitude: Double,
-    @ColumnInfo(name = "obj_id") val objId: Int
+    @ColumnInfo(name = "obj_id") val objId: Int,
 )

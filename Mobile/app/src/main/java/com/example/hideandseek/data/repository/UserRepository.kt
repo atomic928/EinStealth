@@ -15,9 +15,9 @@ interface UserRepository {
     suspend fun deleteAll()
 }
 
-class UserRepositoryImpl (
-    private val userDao: UserDao
-): UserRepository {
+class UserRepositoryImpl(
+    private val userDao: UserDao,
+) : UserRepository {
 
     override val allUsers: Flow<List<UserData>>
         get() = userDao.getAll()

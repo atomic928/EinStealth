@@ -23,7 +23,6 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.LocalTime
 
-
 class MainActivity : AppCompatActivity() {
 
     // 直近の現在地情報を取得するためのクライアント
@@ -39,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         MainActivityViewModelFactory(
             (application as MainApplication).locationRepository,
             (application as MainApplication).userRepository,
-            (application as MainApplication).container.apiRepository
+            (application as MainApplication).container.apiRepository,
         )
     }
 
@@ -56,8 +55,11 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_main, R.id.navigation_be_trapped, R.id.navigation_result, R.id.navigation_watch
-            )
+                R.id.navigation_main,
+                R.id.navigation_be_trapped,
+                R.id.navigation_result,
+                R.id.navigation_watch,
+            ),
         )
 
         supportActionBar?.hide()
@@ -70,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         // 正確な位置情報、おおよその位置情報どちらを許可しますか？というダイアログが出る。
         // どちらか選んで許可すれば、選ばれたもの、許可されなければ権限はなし
         val locationPermissionRequest = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
+            ActivityResultContracts.RequestMultiplePermissions(),
         ) { permissions ->
             when {
                 permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
@@ -85,10 +87,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         // リクエストを送る
-        locationPermissionRequest.launch(arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ))
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+            ),
+        )
 
         // 位置情報を取得する
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -98,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
         // 直近の位置情報を取得
         fusedLocationClient.lastLocation
-            .addOnSuccessListener { location : Location? ->
+            .addOnSuccessListener { location: Location? ->
                 // Got last known location. In some rare situations this can be null
                 if (location != null) {
                     // 相対時間の初期化
@@ -150,7 +154,7 @@ class MainActivity : AppCompatActivity() {
         // Roomに相対時間と座標を送る
         viewModel.insertUser(viewModel.relativeTime, location)
         // 10秒おきにAPI通信をする
-        if (viewModel.relativeTime.second%10 == 0) {
+        if (viewModel.relativeTime.second % 10 == 0) {
             viewModel.deleteAllLocation()
             viewModel.postSpacetime(viewModel.relativeTime, location)
             viewModel.getSpacetime(viewModel.relativeTime)
@@ -161,10 +165,10 @@ class MainActivity : AppCompatActivity() {
     private fun checkLocationPermission() {
         if (ActivityCompat.checkSelfPermission(
                 this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION,
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                 this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION,
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             return
@@ -176,10 +180,11 @@ class MainActivity : AppCompatActivity() {
         // 位置情報の権限があるか確認する
         checkLocationPermission()
         // 位置情報の更新
-        fusedLocationClient.requestLocationUpdates(locationRequest,
-        locationCallback,
-            Looper.getMainLooper()
-            )
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper(),
+        )
     }
 
     // 位置情報の更新を止める関数

@@ -13,7 +13,7 @@ interface MapRepository {
     fun getOriginalBitmap(url: String): Bitmap
 }
 
-class MapRepositoryImpl: MapRepository {
+class MapRepositoryImpl : MapRepository {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 

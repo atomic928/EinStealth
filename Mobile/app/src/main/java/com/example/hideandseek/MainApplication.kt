@@ -10,7 +10,7 @@ import com.example.hideandseek.data.repository.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
-class MainApplication: Application() {
+class MainApplication : Application() {
     lateinit var container: AppContainer
     override fun onCreate() {
         super.onCreate()

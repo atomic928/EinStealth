@@ -14,11 +14,11 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-class MainActivityViewModel (
+class MainActivityViewModel(
     private val locationRepository: LocationRepository,
     private val userRepository: UserRepository,
-    private val apiRepository: ApiRepository
-    ): ViewModel() {
+    private val apiRepository: ApiRepository,
+) : ViewModel() {
 
     lateinit var relativeTime: LocalTime
 
@@ -34,7 +34,7 @@ class MainActivityViewModel (
     // 特殊相対性理論によりずれを計算する
     fun calculateGap(location: Location): Long {
         Log.d("GAP", "speed: ${location.speed}, calc: ${(1000000000 * (1 - sqrt(1 - (location.speed / 10).pow(2)))).roundToInt().toLong()}")
-        return  (1000000000 * (1 - sqrt(1 - (location.speed / 10).pow(2)))).roundToInt().toLong()
+        return (1000000000 * (1 - sqrt(1 - (location.speed / 10).pow(2)))).roundToInt().toLong()
     }
 
     // ActivityからrelativeTimeとlocationを受け取り、Roomデータベースにuserデータとして送信
@@ -49,7 +49,7 @@ class MainActivityViewModel (
     private fun insertLocationAll(relativeTime: LocalTime, response: List<ResponseData.ResponseGetSpacetime>) = viewModelScope.launch {
         for (i in response.indices) {
             val user =
-                com.example.hideandseek.data.datasource.local.LocationData(0, relativeTime.toString().substring(0, 8), response[i].Latitude, response[i].Longtitude, response[i].Altitude, response[i].ObjId)
+                com.example.hideandseek.data.datasource.local.LocationData(0, relativeTime.toString().substring(0, 8), response[i].latitude, response[i].longitude, response[i].altitude, response[i].objId)
             withContext(Dispatchers.IO) {
                 locationRepository.insert(user)
             }
@@ -66,7 +66,7 @@ class MainActivityViewModel (
                 } else {
                     Log.d("POST_TEST", "$response")
                 }
-            } catch (e: java.lang.Exception){
+            } catch (e: java.lang.Exception) {
                 Log.d("POST_TEST", "$e")
             }
         }
@@ -82,7 +82,7 @@ class MainActivityViewModel (
                 } else {
                     Log.d("GET_TEST", "$response")
                 }
-            } catch (e: java.lang.Exception){
+            } catch (e: java.lang.Exception) {
                 Log.d("GET_TEST", "$e")
             }
         }
@@ -99,8 +99,8 @@ class MainActivityViewModel (
 class MainActivityViewModelFactory(
     private val locationRepository: LocationRepository,
     private val userRepository: UserRepository,
-    private val apiRepository: ApiRepository
-    ): ViewModelProvider.Factory {
+    private val apiRepository: ApiRepository,
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

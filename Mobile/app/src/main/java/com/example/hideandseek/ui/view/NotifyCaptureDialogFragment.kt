@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.FragmentNotifyCaptureDialogBinding
 
-class NotifyCaptureDialogFragment: DialogFragment() {
+class NotifyCaptureDialogFragment : DialogFragment() {
     private var _binding: FragmentNotifyCaptureDialogBinding? = null
 
     private val binding get() = _binding!!
@@ -21,7 +21,7 @@ class NotifyCaptureDialogFragment: DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentNotifyCaptureDialogBinding.inflate(inflater, container, false)
         val root: View = binding.root

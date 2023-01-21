@@ -12,7 +12,7 @@ import androidx.fragment.app.DialogFragment
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.FragmentCaptureDialogBinding
 
-class CaptureDialogFragment: DialogFragment() {
+class CaptureDialogFragment : DialogFragment() {
     private var _binding: FragmentCaptureDialogBinding? = null
 
     private val binding get() = _binding!!
@@ -20,14 +20,14 @@ class CaptureDialogFragment: DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentCaptureDialogBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         // 捕まったか確認するダイアログ
-        val btCaptureYes:   ImageView = binding.btCaptureYes
-        val btCaptureNo:    ImageView = binding.btCaptureNo
+        val btCaptureYes: ImageView = binding.btCaptureYes
+        val btCaptureNo: ImageView = binding.btCaptureNo
 
         var flag = false
 

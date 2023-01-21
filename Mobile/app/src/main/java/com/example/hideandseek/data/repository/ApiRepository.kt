@@ -16,8 +16,8 @@ interface ApiRepository {
 }
 
 class ApiRepositoryImpl(
-    private val restApiService: RestApi
-): ApiRepository {
+    private val restApiService: RestApi,
+) : ApiRepository {
     override suspend fun getTest(): Response<ResponseData.ResponseGetTest> =
         restApiService.getTest()
 
