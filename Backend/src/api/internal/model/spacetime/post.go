@@ -3,7 +3,7 @@ package spacetime
 import "github.com/p2hacks2022/post-team05/internal/model"
 
 // spacetimesにinsertする
-func Post(time string, latitude, longitude, altitude float32, objId int) error {
+func Post(time string, latitude, longitude, altitude float64, objId int) error {
 	// dbmap初期化
 	dbmap, err := model.InitDb()
 	if err != nil {
