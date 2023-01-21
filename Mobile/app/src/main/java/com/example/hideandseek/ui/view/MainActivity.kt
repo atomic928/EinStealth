@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainActivityViewModel by viewModels {
         MainActivityViewModelFactory(
             (application as MainApplication).locationRepository,
-            (application as MainApplication).trapRepository,
             (application as MainApplication).userRepository,
             (application as MainApplication).container.apiRepository
         )
@@ -104,9 +103,6 @@ class MainActivity : AppCompatActivity() {
                 if (location != null) {
                     // 相対時間の初期化
                     viewModel.setUpRelativeTime(LocalTime.now())
-                    // User情報の初期化はアプリの起動時にのみ行う
-                    viewModel.deleteAllUser()
-                    viewModel.deleteAllTrap()
                     postCalculatedRelativeTime(location)
                 }
             }

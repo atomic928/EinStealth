@@ -21,10 +21,10 @@ class MainApplication: Application() {
 
     private val applicationScope = CoroutineScope(SupervisorJob())
 
-    private val userDatabase by lazy { UserRoomDatabase.getInstance(this) }
+    private val userDatabase by lazy { UserRoomDatabase.getInstance(this, applicationScope) }
     val userRepository by lazy { UserRepositoryImpl(userDatabase.userDao()) }
 
-    private val trapDatabase by lazy { TrapRoomDatabase.getInstance(this) }
+    private val trapDatabase by lazy { TrapRoomDatabase.getInstance(this, applicationScope) }
     val trapRepository by lazy { TrapRepositoryImpl(trapDatabase.trapDao()) }
 
     private val locationDatabase by lazy { LocationRoomDatabase.getInstance(this, applicationScope) }
