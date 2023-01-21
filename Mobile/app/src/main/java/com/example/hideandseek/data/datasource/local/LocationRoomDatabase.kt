@@ -8,23 +8,23 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [UserData::class], version = 1, exportSchema = false)
-abstract class UserRoomDatabase: RoomDatabase() {
+@Database(entities = [LocationData::class], version = 1, exportSchema = false)
+abstract class LocationRoomDatabase: RoomDatabase() {
 
-    abstract fun userDao() : UserDao
+    abstract fun locationDao() : LocationDao
 
     // アプリの起動時にデータベースを初期化する
-    private class UserRoomDatabaseCallback(
+    private class LocationRoomDatabaseCallback(
         private val scope: CoroutineScope
     ): RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    val userDao = database.userDao()
+                    val locationDao = database.locationDao()
 
                     // Delete all content here
-                    userDao.deleteAll()
+                    locationDao.deleteAll()
                 }
             }
         }
@@ -32,19 +32,19 @@ abstract class UserRoomDatabase: RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: UserRoomDatabase? = null
+        private var INSTANCE: LocationRoomDatabase? = null
 
         fun getInstance(
             context: Context,
             scope: CoroutineScope
-        ): UserRoomDatabase {
+        ): LocationRoomDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    UserRoomDatabase::class.java,
-                    "user_db4"
+                    LocationRoomDatabase::class.java,
+                    "location_db"
                 )
-                    .addCallback(UserRoomDatabaseCallback(scope))
+                    .addCallback(LocationRoomDatabaseCallback(scope))
                     .build()
                 INSTANCE = instance
                 instance

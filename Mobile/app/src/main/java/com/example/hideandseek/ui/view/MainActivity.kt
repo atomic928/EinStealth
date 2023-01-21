@@ -2,39 +2,25 @@ package com.example.hideandseek.ui.view
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
 import android.os.Looper
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.hideandseek.MainApplication
 import com.example.hideandseek.R
-import com.example.hideandseek.data.datasource.local.User
-import com.example.hideandseek.data.datasource.local.UserRoomDatabase
 import com.example.hideandseek.databinding.ActivityMainBinding
 import com.example.hideandseek.ui.viewmodel.MainActivityViewModel
+import com.example.hideandseek.ui.viewmodel.MainActivityViewModelFactory
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import java.net.URL
 import java.time.LocalTime
 
 
@@ -49,7 +35,13 @@ class MainActivity : AppCompatActivity() {
     // 現在地を更新するためのコールバック
     private lateinit var locationCallback: LocationCallback
 
-    private val viewModel: MainActivityViewModel by viewModels()
+    private val viewModel: MainActivityViewModel by viewModels {
+        MainActivityViewModelFactory(
+            (application as MainApplication).locationRepository,
+            (application as MainApplication).userRepository,
+            (application as MainApplication).container.apiRepository
+        )
+    }
 
     private lateinit var binding: ActivityMainBinding
 
@@ -64,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_main
+                R.id.navigation_main, R.id.navigation_be_trapped, R.id.navigation_result, R.id.navigation_watch
             )
         )
 
@@ -111,8 +103,6 @@ class MainActivity : AppCompatActivity() {
                 if (location != null) {
                     // 相対時間の初期化
                     viewModel.setUpRelativeTime(LocalTime.now())
-                    // Roomデータベースの初期化
-                    viewModel.deleteAll(applicationContext)
                     postCalculatedRelativeTime(location)
                 }
             }
@@ -158,13 +148,12 @@ class MainActivity : AppCompatActivity() {
         // 相対時間を計算
         viewModel.calculateRelativeTime(gap)
         // Roomに相対時間と座標を送る
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect {
-                    // Update UI elements
-                    viewModel.insert(it.relativeTime, location, applicationContext)
-                }
-            }
+        viewModel.insertUser(viewModel.relativeTime, location)
+        // 10秒おきにAPI通信をする
+        if (viewModel.relativeTime.second%10 == 0) {
+            viewModel.deleteAllLocation()
+            viewModel.postSpacetime(viewModel.relativeTime, location)
+            viewModel.getSpacetime(viewModel.relativeTime)
         }
     }
 

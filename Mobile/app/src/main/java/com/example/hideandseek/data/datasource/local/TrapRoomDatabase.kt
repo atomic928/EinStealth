@@ -8,23 +8,23 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [UserData::class], version = 1, exportSchema = false)
-abstract class UserRoomDatabase: RoomDatabase() {
+@Database(entities = [TrapData::class], version = 1, exportSchema = false)
+abstract class TrapRoomDatabase: RoomDatabase() {
 
-    abstract fun userDao() : UserDao
+    abstract fun trapDao() : TrapDao
 
     // アプリの起動時にデータベースを初期化する
-    private class UserRoomDatabaseCallback(
+    private class TrapRoomDatabaseCallback(
         private val scope: CoroutineScope
     ): RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    val userDao = database.userDao()
+                    val trapDao = database.trapDao()
 
                     // Delete all content here
-                    userDao.deleteAll()
+                    trapDao.deleteAll()
                 }
             }
         }
@@ -32,19 +32,19 @@ abstract class UserRoomDatabase: RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: UserRoomDatabase? = null
+        private var INSTANCE: TrapRoomDatabase? = null
 
         fun getInstance(
             context: Context,
             scope: CoroutineScope
-        ): UserRoomDatabase {
+        ): TrapRoomDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    UserRoomDatabase::class.java,
-                    "user_db4"
+                    TrapRoomDatabase::class.java,
+                    "trap_db"
                 )
-                    .addCallback(UserRoomDatabaseCallback(scope))
+                    .addCallback(TrapRoomDatabaseCallback(scope))
                     .build()
                 INSTANCE = instance
                 instance

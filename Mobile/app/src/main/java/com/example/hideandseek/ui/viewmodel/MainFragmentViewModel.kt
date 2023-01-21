@@ -1,31 +1,52 @@
 package com.example.hideandseek.ui.viewmodel
 
-import android.app.Application
-import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.hideandseek.data.datasource.local.User
-import com.example.hideandseek.data.datasource.local.UserRoomDatabase
+import com.example.hideandseek.data.datasource.local.*
 import com.example.hideandseek.data.datasource.remote.PostData
-import com.example.hideandseek.data.repository.ApiRepository
-import com.example.hideandseek.data.repository.MapRepository
-import com.example.hideandseek.data.repository.UserRepository
+import com.example.hideandseek.data.repository.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.abs
 
-class MainFragmentViewModel: ViewModel() {
-    lateinit var allUsersLive: LiveData<List<User>>
-    private val repository = ApiRepository.instance
+class MainFragmentViewModel (
+    locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository,
+    private val mapRepository: MapRepository
+): ViewModel() {
+    val allLocationsLive = locationRepository.allLocations.asLiveData()
+    val allTrapsLive = trapRepository.allTraps.asLiveData()
+    val userLive = userRepository.allUsers.asLiveData()
 
-    fun setAllUsersLive(context: Context) {
-        allUsersLive = UserRepository(context).allUsers.asLiveData()
+    suspend fun getNowUser(): UserData {
+        return userRepository.getLatest()
+    }
+
+    fun postTrapRoom(isMine: Int) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            Log.d("USER_TRAP", userRepository.getLatest().toString())
+            val nowUser = userRepository.getLatest()
+            val trap = TrapData(0, nowUser.latitude, nowUser.longitude, nowUser.altitude, isMine)
+            trapRepository.insert(trap)
+        }
+    }
+
+    private val _skillTime = MutableLiveData<String>()
+    val skillTime: LiveData<String> = _skillTime
+
+    fun setSkillTime() = viewModelScope.launch{
+        withContext(Dispatchers.Main) {
+            val nowUser = userRepository.getLatest()
+            _skillTime.value = nowUser.relativeTime
+        }
+    }
+
+    fun setSkillTImeString(skillTime: String) {
+        _skillTime.value = skillTime
     }
 
     private val _limitTime = MutableLiveData<String>()
@@ -33,24 +54,24 @@ class MainFragmentViewModel: ViewModel() {
 
     // RelativeTime+15分の時間を制限時間とする
     fun setLimitTime(relativeTime: String) {
-        var limitTime = ""
+        val limitTime: String
         if (relativeTime.substring(3, 5).toInt() < 45) {
             limitTime = relativeTime.substring(0, 3) + (relativeTime.substring(3, 5).toInt()+15).toString() + relativeTime.substring(5)
         } else if (relativeTime.substring(3, 5).toInt() < 55) {
-            if (relativeTime.substring(0, 2).toInt() == 23) {
-                limitTime = "00:0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+            limitTime = if (relativeTime.substring(0, 2).toInt() == 23) {
+                "00:0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             } else if (relativeTime.substring(0, 2).toInt() >= 9) {
-                limitTime = (relativeTime.substring(0, 2).toInt()+1).toString()+":0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+                (relativeTime.substring(0, 2).toInt()+1).toString()+":0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             } else {
-                limitTime = "0"+(relativeTime.substring(0, 2).toInt()+1).toString()+":0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+                "0"+(relativeTime.substring(0, 2).toInt()+1).toString()+":0"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             }
         } else {
-            if (relativeTime.substring(0, 2).toInt() == 23) {
-                limitTime = "00:"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+            limitTime = if (relativeTime.substring(0, 2).toInt() == 23) {
+                "00:"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             } else if (relativeTime.substring(0, 2).toInt() >= 9) {
-                limitTime = (relativeTime.substring(0, 2).toInt()+1).toString()+":"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+                (relativeTime.substring(0, 2).toInt()+1).toString()+":"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             } else {
-                limitTime = "0"+(relativeTime.substring(0, 2).toInt()+1).toString()+":"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
+                "0"+(relativeTime.substring(0, 2).toInt()+1).toString()+":"+((relativeTime.substring(3, 5).toInt()+15)%60).toString() + relativeTime.substring(5)
             }
         }
         _limitTime.value = limitTime
@@ -68,16 +89,31 @@ class MainFragmentViewModel: ViewModel() {
     val isOverSkillTime: LiveData<Boolean> = _isOverSkillTime
 
     fun compareSkillTime(relativeTime: String, skillTime: String) {
-        if (relativeTime.substring(6, 7) == skillTime.substring(6, 7)) {
-            _isOverSkillTime.value = relativeTime.substring(3, 5).toInt() > skillTime.substring(3, 5).toInt()
+        Log.d("CompareSkillTime", "relative: $relativeTime, skill: $skillTime")
+        if (relativeTime.substring(6, 8) == skillTime.substring(6, 8)) {
+            _isOverSkillTime.value = relativeTime != skillTime
         }
     }
 
+    fun checkCaughtTrap(user: UserData, trap: TrapData): Boolean {
+        // UserがTrapと一定の距離に来たかどうかを返す
+        Log.d("checkCaughtTrap", (abs(user.latitude-trap.latitude) + abs(user.longitude-trap.longitude)).toString())
+        // 自分の罠の場合は当たり判定を行わない
+        if (trap.objId == 0) {
+            return false
+        }
+        // 緯度・経度1どの違いで約100kmの差
+        // よって0.00001の差で1m程度の差になる
+        // 今回は0.000001以内、つまり10cm以内に入ったら当たった判定
+        return (abs(user.latitude-trap.latitude) < 0.000001 && abs(user.longitude-trap.longitude) < 0.000001)
+    }
+
     fun howProgressSkillTime(relativeTime: String, skillTime: String): Int {
-        if (relativeTime.substring(6).toInt() < skillTime.substring(6).toInt()) {
-            return (60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60
+        Log.d("HowProgress", ((60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60).toString())
+        return if (relativeTime.substring(6).toInt() < skillTime.substring(6).toInt()) {
+            (60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60
         } else {
-            return relativeTime.substring(6).toInt()-skillTime.substring(6).toInt()
+            relativeTime.substring(6).toInt()-skillTime.substring(6).toInt()
         }
     }
 
@@ -92,99 +128,42 @@ class MainFragmentViewModel: ViewModel() {
         _map.value = p0
     }
 
-    fun getTest() {
+    fun postTrapSpacetime() {
         viewModelScope.launch(Dispatchers.IO) {
+            val nowUser = userRepository.getLatest()
             try {
-                val response = repository.getTest()
+                val request = PostData.PostSpacetime(nowUser.relativeTime.substring(0, 7)+ "0", nowUser.latitude, nowUser.longitude, nowUser.altitude, 1)
+                val response = apiRepository.postSpacetime(request)
                 if (response.isSuccessful) {
-                    Log.d("GETTEST", "${response}\n${response.body()}")
+                    Log.d("POST_TEST", "${response}\n${response.body()}")
                 } else {
-                    Log.d("GETTEST", "$response")
+                    Log.d("POST_TEST", "$response")
                 }
             } catch (e: java.lang.Exception){
-                Log.d("GETTEST", "$e")
-            }
-        }
-    }
-
-    fun postStatus(id: Int, status: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = repository.postStatus(id, status)
-                if (response.isSuccessful) {
-                    Log.d("GETTEST", "${response}\n${response.body()}")
-                } else {
-                    Log.d("GETTEST", "$response")
-                }
-            } catch (e: java.lang.Exception){
-                Log.d("GETTEST", "$e")
-            }
-        }
-    }
-
-    fun getSpacetime(time: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = repository.getSpacetime(time)
-                if (response.isSuccessful) {
-                    Log.d("GETTEST", "${response}\n${response.body()}")
-                } else {
-                    Log.d("GETTEST", "$response")
-                }
-            } catch (e: java.lang.Exception){
-                Log.d("GETTEST", "$e")
-            }
-        }
-    }
-
-    fun postSpacetime(request: PostData.PostSpacetime) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = repository.postSpacetime(request)
-                if (response.isSuccessful) {
-                    Log.d("POSTTEST", "${response}\n${response.body()}")
-                } else {
-                    Log.d("POSTTEST", "$response")
-                }
-            } catch (e: java.lang.Exception){
-                Log.d("POSTTEST", "$e")
-            }
-        }
-    }
-
-    fun setUpDemoList(locationArray: Array<Array<Array<Double?>>>, statusArray: Array<Array<Array<Int?>>>) {
-        // デモ用のリスト作成
-        for (i in 0..239) {
-            locationArray[i][0][0] = 41.84202707025747 + i*0.00001
-            locationArray[i][0][1] = 140.7673718711624 + i*0.00001
-            statusArray[i][0][0] = 0
-            statusArray[i][0][1] = 0
-            locationArray[i][1][0] = 41.84222707025747 + i*0.00001
-            locationArray[i][1][1] = 140.7673718711624 + i*0.00001
-            statusArray[i][1][0] = 0
-            statusArray[i][1][1] = 0
-            locationArray[i][2][0] = 41.84192707025747 + i*0.00001
-            locationArray[i][2][1] = 140.7674718711624 + i*0.00001
-            statusArray[i][2][0] = 1
-            statusArray[i][2][1] = 0
-            if (i > 60) {
-                locationArray[i][0][0] = 41.84202707025747 - i*0.000001
-                locationArray[i][0][1] = 140.7673718711624 - i*0.00001
-                statusArray[i][0][0] = 0
-                statusArray[i][0][1] = 0
-                locationArray[i][1][0] = 41.84222707025747 - i*0.000001
-                locationArray[i][1][1] = 140.7673718711624 - i*0.000015
-                statusArray[i][1][0] = 0
-                statusArray[i][1][1] = 1
-                locationArray[i][2][0] = 41.84192707025747 - i*0.000001
-                locationArray[i][2][1] = 140.7674718711624 - i*0.000015
-                statusArray[i][2][0] = 1
-                statusArray[i][2][1] = 0
+                Log.d("POST_TEST", "$e")
             }
         }
     }
 
     suspend fun fetchMap(url: String): Bitmap {
-        return MapRepository().fetchMap(url)
+        return mapRepository.fetchMap(url)
     }
 }
+
+class MainFragmentViewModelFactory(
+    private val locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository,
+    private val mapRepository: MapRepository
+): ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MainFragmentViewModel(locationRepository, trapRepository, userRepository, apiRepository, mapRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+

@@ -1,20 +1,12 @@
 package com.example.hideandseek.ui.viewmodel
 
-import android.app.Application
-import android.content.Context
 import android.location.Location
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
-import com.example.hideandseek.data.datasource.local.User
-import com.example.hideandseek.data.repository.UserRepository
+import com.example.hideandseek.data.datasource.remote.PostData
+import com.example.hideandseek.data.datasource.remote.ResponseData
+import com.example.hideandseek.data.repository.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalTime
@@ -22,30 +14,21 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-data class MainActivityUiState(
-    val relativeTime: LocalTime = LocalTime.MAX
-)
+class MainActivityViewModel (
+    private val locationRepository: LocationRepository,
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
+    ): ViewModel() {
 
-class MainActivityViewModel: ViewModel() {
-    private val _uiState = MutableStateFlow(MainActivityUiState())
-    val uiState: StateFlow<MainActivityUiState> = _uiState.asStateFlow()
+    lateinit var relativeTime: LocalTime
 
     // relativeTimeの初期値（アプリを起動したときのLocalTime）をセットする
     fun setUpRelativeTime(nowTime: LocalTime) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                relativeTime = nowTime
-            )
-        }
+        relativeTime = nowTime
     }
 
     fun calculateRelativeTime(gap: Long) {
-        _uiState.update { currentState ->
-            Log.d("relativeTime", currentState.relativeTime.toString())
-            currentState.copy(
-                relativeTime = currentState.relativeTime.minusNanos(gap).plusSeconds(1)
-            )
-        }
+        relativeTime = relativeTime.minusNanos(gap)?.plusSeconds(1)!!
     }
 
     // 特殊相対性理論によりずれを計算する
@@ -55,17 +38,74 @@ class MainActivityViewModel: ViewModel() {
     }
 
     // ActivityからrelativeTimeとlocationを受け取り、Roomデータベースにuserデータとして送信
-    fun insert(relativeTime: LocalTime, location: Location, context: Context) = viewModelScope.launch {
-        val user = User(0, relativeTime.toString().substring(0, 8), location.longitude, location.latitude)
+    fun insertUser(relativeTime: LocalTime, location: Location) = viewModelScope.launch {
+        val user =
+            com.example.hideandseek.data.datasource.local.UserData(0, relativeTime.toString().substring(0, 8), location.latitude, location.longitude, location.altitude)
         withContext(Dispatchers.IO) {
-            UserRepository(context).insert(user)
+            userRepository.insert(user)
         }
     }
 
-    // Userデータベースのデータを全消去
-    fun deleteAll(context: Context) = viewModelScope.launch {
-        withContext(Dispatchers.IO) {
-            UserRepository(context).deleteAll()
+    private fun insertLocationAll(relativeTime: LocalTime, response: List<ResponseData.ResponseGetSpacetime>) = viewModelScope.launch {
+        for (i in response.indices) {
+            val user =
+                com.example.hideandseek.data.datasource.local.LocationData(0, relativeTime.toString().substring(0, 8), response[i].Latitude, response[i].Longtitude, response[i].Altitude, response[i].ObjId)
+            withContext(Dispatchers.IO) {
+                locationRepository.insert(user)
+            }
         }
+    }
+
+    fun postSpacetime(relativeTime: LocalTime, location: Location) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val request = PostData.PostSpacetime(relativeTime.toString().substring(0, 8), location.latitude, location.longitude, location.altitude, 0)
+                val response = apiRepository.postSpacetime(request)
+                if (response.isSuccessful) {
+                    Log.d("POST_TEST", "${response}\n${response.body()}")
+                } else {
+                    Log.d("POST_TEST", "$response")
+                }
+            } catch (e: java.lang.Exception){
+                Log.d("POST_TEST", "$e")
+            }
+        }
+    }
+
+    fun getSpacetime(relativeTime: LocalTime) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = apiRepository.getSpacetime(relativeTime.toString().substring(0, 8))
+                if (response.isSuccessful) {
+                    Log.d("GET_TEST", "${response}\n${response.body()}")
+                    response.body()?.let { insertLocationAll(relativeTime, it) }
+                } else {
+                    Log.d("GET_TEST", "$response")
+                }
+            } catch (e: java.lang.Exception){
+                Log.d("GET_TEST", "$e")
+            }
+        }
+    }
+
+    // Locationデータベースのデータを全消去
+    fun deleteAllLocation() = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            locationRepository.deleteAll()
+        }
+    }
+}
+
+class MainActivityViewModelFactory(
+    private val locationRepository: LocationRepository,
+    private val userRepository: UserRepository,
+    private val apiRepository: ApiRepository
+    ): ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MainActivityViewModel(locationRepository, userRepository, apiRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

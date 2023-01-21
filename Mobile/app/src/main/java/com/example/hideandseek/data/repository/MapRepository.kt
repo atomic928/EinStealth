@@ -7,18 +7,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import java.net.URL
 
-class MapRepository {
+interface MapRepository {
+    suspend fun fetchMap(url: String): Bitmap
+
+    fun getOriginalBitmap(url: String): Bitmap
+}
+
+class MapRepositoryImpl: MapRepository {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
-    suspend fun fetchMap(url: String): Bitmap {
+    override suspend fun fetchMap(url: String): Bitmap {
         val originalDeferred = coroutineScope.async(Dispatchers.IO) {
             getOriginalBitmap(url)
         }
         return originalDeferred.await()
     }
 
-    private fun getOriginalBitmap(url: String): Bitmap =
+    override fun getOriginalBitmap(url: String): Bitmap =
         URL(url).openStream().use {
             BitmapFactory.decodeStream(it)
         }
