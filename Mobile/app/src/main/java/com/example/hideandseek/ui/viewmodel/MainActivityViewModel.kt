@@ -16,6 +16,7 @@ import kotlin.math.sqrt
 
 class MainActivityViewModel(
     private val locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
     private val apiRepository: ApiRepository,
 ) : ViewModel() {
@@ -94,17 +95,30 @@ class MainActivityViewModel(
             locationRepository.deleteAll()
         }
     }
+
+    fun deleteAllUser() = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            userRepository.deleteAll()
+        }
+    }
+
+    fun deleteAllTrap() = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            trapRepository.deleteAll()
+        }
+    }
 }
 
 class MainActivityViewModelFactory(
     private val locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
     private val apiRepository: ApiRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainActivityViewModel(locationRepository, userRepository, apiRepository) as T
+            return MainActivityViewModel(locationRepository, trapRepository, userRepository, apiRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
