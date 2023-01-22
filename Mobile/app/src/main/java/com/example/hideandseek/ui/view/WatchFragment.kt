@@ -8,26 +8,19 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.hideandseek.MainApplication
 import com.example.hideandseek.data.datasource.local.LocationData
 import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.databinding.FragmentWatchBinding
 import com.example.hideandseek.ui.viewmodel.WatchFragmentViewModel
-import com.example.hideandseek.ui.viewmodel.WatchFragmentViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class WatchFragment : Fragment() {
     private var _binding: FragmentWatchBinding? = null
-    private val viewModel: WatchFragmentViewModel by viewModels {
-        WatchFragmentViewModelFactory(
-            (activity?.application as MainApplication).locationRepository,
-            (activity?.application as MainApplication).trapRepository,
-            (activity?.application as MainApplication).userRepository,
-            (activity?.application as MainApplication).mapRepository,
-        )
-    }
+    private val viewModel: WatchFragmentViewModel by viewModels()
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 

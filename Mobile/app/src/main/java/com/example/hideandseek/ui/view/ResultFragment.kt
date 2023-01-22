@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.hideandseek.databinding.FragmentResultBinding
 import com.example.hideandseek.ui.viewmodel.ResultFragmentViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ResultFragment : Fragment() {
     private var _binding: FragmentResultBinding? = null
     private val viewModel: ResultFragmentViewModel by viewModels()

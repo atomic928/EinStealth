@@ -5,11 +5,14 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.data.repository.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class WatchFragmentViewModel(
+@HiltViewModel
+class WatchFragmentViewModel @Inject constructor(
     locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
@@ -37,20 +40,5 @@ class WatchFragmentViewModel(
 
     suspend fun fetchMap(url: String): Bitmap {
         return mapRepository.fetchMap(url)
-    }
-}
-
-class WatchFragmentViewModelFactory(
-    private val locationRepository: LocationRepository,
-    private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository,
-    private val mapRepository: MapRepository,
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(WatchFragmentViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return WatchFragmentViewModel(locationRepository, trapRepository, userRepository, mapRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

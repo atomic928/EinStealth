@@ -4,6 +4,7 @@ import androidx.annotation.WorkerThread
 import com.example.hideandseek.data.datasource.local.UserDao
 import com.example.hideandseek.data.datasource.local.UserData
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 interface UserRepository {
     val allUsers: Flow<List<UserData>>
@@ -15,7 +16,7 @@ interface UserRepository {
     suspend fun deleteAll()
 }
 
-class UserRepositoryImpl(
+class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
 ) : UserRepository {
 

@@ -13,16 +13,16 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.hideandseek.MainApplication
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.ActivityMainBinding
 import com.example.hideandseek.ui.viewmodel.MainActivityViewModel
-import com.example.hideandseek.ui.viewmodel.MainActivityViewModelFactory
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalTime
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     // 直近の現在地情報を取得するためのクライアント
@@ -34,14 +34,7 @@ class MainActivity : AppCompatActivity() {
     // 現在地を更新するためのコールバック
     private lateinit var locationCallback: LocationCallback
 
-    private val viewModel: MainActivityViewModel by viewModels {
-        MainActivityViewModelFactory(
-            (application as MainApplication).locationRepository,
-            (application as MainApplication).trapRepository,
-            (application as MainApplication).userRepository,
-            (application as MainApplication).container.apiRepository,
-        )
-    }
+    private val viewModel: MainActivityViewModel by viewModels()
 
     private lateinit var binding: ActivityMainBinding
 

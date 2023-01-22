@@ -6,13 +6,16 @@ import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.local.*
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.repository.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import kotlin.math.abs
 
-class MainFragmentViewModel(
-    locationRepository: LocationRepository,
+@HiltViewModel
+class MainFragmentViewModel @Inject constructor(
+    private val locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
     private val apiRepository: ApiRepository,
@@ -147,21 +150,5 @@ class MainFragmentViewModel(
 
     suspend fun fetchMap(url: String): Bitmap {
         return mapRepository.fetchMap(url)
-    }
-}
-
-class MainFragmentViewModelFactory(
-    private val locationRepository: LocationRepository,
-    private val trapRepository: TrapRepository,
-    private val userRepository: UserRepository,
-    private val apiRepository: ApiRepository,
-    private val mapRepository: MapRepository,
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MainFragmentViewModel(locationRepository, trapRepository, userRepository, apiRepository, mapRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

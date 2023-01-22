@@ -4,6 +4,7 @@ import androidx.annotation.WorkerThread
 import com.example.hideandseek.data.datasource.local.LocationDao
 import com.example.hideandseek.data.datasource.local.LocationData
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 interface LocationRepository {
     val allLocations: Flow<List<LocationData>>
@@ -13,7 +14,7 @@ interface LocationRepository {
     suspend fun deleteAll()
 }
 
-class LocationRepositoryImpl(
+class LocationRepositoryImpl @Inject constructor(
     private val locationDao: LocationDao,
 ) : LocationRepository {
 

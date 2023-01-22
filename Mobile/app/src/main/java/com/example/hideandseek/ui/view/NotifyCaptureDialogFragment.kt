@@ -12,7 +12,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.FragmentNotifyCaptureDialogBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class NotifyCaptureDialogFragment : DialogFragment() {
     private var _binding: FragmentNotifyCaptureDialogBinding? = null
 

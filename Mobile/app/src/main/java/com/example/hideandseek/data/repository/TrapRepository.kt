@@ -3,6 +3,7 @@ package com.example.hideandseek.data.repository
 import androidx.annotation.WorkerThread
 import com.example.hideandseek.data.datasource.local.*
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 interface TrapRepository {
     val allTraps: Flow<List<TrapData>>
@@ -12,7 +13,7 @@ interface TrapRepository {
     suspend fun deleteAll()
 }
 
-class TrapRepositoryImpl(
+class TrapRepositoryImpl @Inject constructor(
     private val trapDao: TrapDao,
 ) : TrapRepository {
 
