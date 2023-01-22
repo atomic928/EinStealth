@@ -20,20 +20,13 @@ import com.example.hideandseek.data.datasource.local.LocationData
 import com.example.hideandseek.data.datasource.local.TrapData
 import com.example.hideandseek.databinding.FragmentMainBinding
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModel
-import com.example.hideandseek.ui.viewmodel.MainFragmentViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
+@AndroidEntryPoint
 class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
-    private val viewModel: MainFragmentViewModel by viewModels {
-        MainFragmentViewModelFactory(
-            (activity?.application as MainApplication).locationRepository,
-            (activity?.application as MainApplication).trapRepository,
-            (activity?.application as MainApplication).userRepository,
-            (activity?.application as MainApplication).container.apiRepository,
-            (activity?.application as MainApplication).mapRepository,
-        )
-    }
+    private val viewModel: MainFragmentViewModel by viewModels()
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 

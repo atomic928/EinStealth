@@ -11,7 +11,9 @@ import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.FragmentCaptureDialogBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class CaptureDialogFragment : DialogFragment() {
     private var _binding: FragmentCaptureDialogBinding? = null
 

@@ -12,7 +12,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.FragmentSuccessEscapeDialogBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SuccessEscapeDialogFragment : DialogFragment() {
     private var _binding: FragmentSuccessEscapeDialogBinding? = null
 

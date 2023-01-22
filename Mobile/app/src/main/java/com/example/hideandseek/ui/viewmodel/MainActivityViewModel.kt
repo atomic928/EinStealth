@@ -6,16 +6,20 @@ import androidx.lifecycle.*
 import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.datasource.remote.ResponseData
 import com.example.hideandseek.data.repository.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalTime
+import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-class MainActivityViewModel(
+@HiltViewModel
+class MainActivityViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
+    private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
     private val apiRepository: ApiRepository,
 ) : ViewModel() {
@@ -94,18 +98,16 @@ class MainActivityViewModel(
             locationRepository.deleteAll()
         }
     }
-}
 
-class MainActivityViewModelFactory(
-    private val locationRepository: LocationRepository,
-    private val userRepository: UserRepository,
-    private val apiRepository: ApiRepository,
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MainActivityViewModel(locationRepository, userRepository, apiRepository) as T
+    fun deleteAllUser() = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            userRepository.deleteAll()
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+
+    fun deleteAllTrap() = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            trapRepository.deleteAll()
+        }
     }
 }

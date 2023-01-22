@@ -4,6 +4,7 @@ import com.example.hideandseek.data.datasource.remote.PostData
 import com.example.hideandseek.data.datasource.remote.ResponseData
 import com.example.hideandseek.data.datasource.remote.RestApi
 import retrofit2.Response
+import javax.inject.Inject
 
 interface ApiRepository {
     suspend fun getTest(): Response<ResponseData.ResponseGetTest>
@@ -15,7 +16,7 @@ interface ApiRepository {
     suspend fun postSpacetime(request: PostData.PostSpacetime): Response<ResponseData.ResponsePost>
 }
 
-class ApiRepositoryImpl(
+class ApiRepositoryImpl @Inject constructor(
     private val restApiService: RestApi,
 ) : ApiRepository {
     override suspend fun getTest(): Response<ResponseData.ResponseGetTest> =
