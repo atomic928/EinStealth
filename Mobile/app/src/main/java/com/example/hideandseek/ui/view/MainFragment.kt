@@ -23,7 +23,7 @@ import com.example.hideandseek.ui.viewmodel.MainFragmentViewModel
 import com.example.hideandseek.ui.viewmodel.MainFragmentViewModelFactory
 import kotlinx.coroutines.*
 
-class MainFragment: Fragment() {
+class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val viewModel: MainFragmentViewModel by viewModels {
         MainFragmentViewModelFactory(
@@ -31,7 +31,7 @@ class MainFragment: Fragment() {
             (activity?.application as MainApplication).trapRepository,
             (activity?.application as MainApplication).userRepository,
             (activity?.application as MainApplication).container.apiRepository,
-            (activity?.application as MainApplication).mapRepository
+            (activity?.application as MainApplication).mapRepository,
         )
     }
 
@@ -42,33 +42,33 @@ class MainFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        
+
         // Viewの取得
         // 時間表示の場所
-        val tvRelativeTime:   TextView  = binding.tvRelativeTime
-        val tvLimitTime:      TextView  = binding.tvLimitTime
+        val tvRelativeTime: TextView = binding.tvRelativeTime
+        val tvLimitTime: TextView = binding.tvLimitTime
         // Map
-        val ivMap:            ImageView = binding.ivMap
+        val ivMap: ImageView = binding.ivMap
         // 捕まったボタン
-        val btCaptureOn:      ImageView = binding.btCaptureOn
+        val btCaptureOn: ImageView = binding.btCaptureOn
 
         // スキルボタン
-        val btSkillOn:        ImageView   = binding.btSkillOn
-        val btSkillOff:       ImageView   = binding.btSkillOff
-        val progressSkill:    ProgressBar = binding.progressSkill
+        val btSkillOn: ImageView = binding.btSkillOn
+        val btSkillOff: ImageView = binding.btSkillOff
+        val progressSkill: ProgressBar = binding.progressSkill
 
         fun changeBtSkillVisible(isOn: Boolean) {
             if (isOn) {
-                btSkillOn.visibility     = View.VISIBLE
-                btSkillOff.visibility    = View.INVISIBLE
+                btSkillOn.visibility = View.VISIBLE
+                btSkillOff.visibility = View.INVISIBLE
                 progressSkill.visibility = View.INVISIBLE
             } else {
-                btSkillOn.visibility     = View.INVISIBLE
-                btSkillOff.visibility    = View.VISIBLE
+                btSkillOn.visibility = View.INVISIBLE
+                btSkillOff.visibility = View.VISIBLE
                 progressSkill.visibility = View.VISIBLE
 
                 progressSkill.max = 60
@@ -77,16 +77,16 @@ class MainFragment: Fragment() {
 
         // User normal
         // TODO: Statusを受け取って表示が切り替わるようにする
-        val user1Normal:      ImageView = binding.user1Normal
-        val user2Normal:      ImageView = binding.user2Normal
-        val user3Normal:      ImageView = binding.user3Normal
+        val user1Normal: ImageView = binding.user1Normal
+        val user2Normal: ImageView = binding.user2Normal
+        val user3Normal: ImageView = binding.user3Normal
         // User demon
-        val user4Demon:       ImageView = binding.user4Demon
+        val user4Demon: ImageView = binding.user4Demon
         // User captured
-        val user1Captured:    ImageView = binding.user1Captured
+        val user1Captured: ImageView = binding.user1Captured
 
         // BeTrappedFragmentから戻ってきた時
-        setFragmentResultListener("BeTrappedFragmentSkillTime") {_, bundle ->
+        setFragmentResultListener("BeTrappedFragmentSkillTime") { _, bundle ->
             val result = bundle.getString("skillTime")
             Log.d("skillTimeResultFragment", result.toString())
             if (result != null) {
@@ -94,7 +94,7 @@ class MainFragment: Fragment() {
             }
         }
 
-        setFragmentResultListener("BeTrappedFragmentIsOverSkillTime") {_, bundle ->
+        setFragmentResultListener("BeTrappedFragmentIsOverSkillTime") { _, bundle ->
             val result = bundle.getBoolean("isOverSkillTime")
             Log.d("isOverSkillTimeResultFragment", result.toString())
             viewModel.setIsOverSkillTime(result)
@@ -128,19 +128,19 @@ class MainFragment: Fragment() {
             Log.d("UserLive", userLive.toString())
             if (userLive.isNotEmpty()) {
                 viewModel.setLimitTime(userLive[0].relativeTime)
-                tvRelativeTime.text = userLive[userLive.size-1].relativeTime
+                tvRelativeTime.text = userLive[userLive.size - 1].relativeTime
                 // 制限時間になったかどうかの判定
-                viewModel.compareTime(userLive[userLive.size-1].relativeTime, limitTime)
+                viewModel.compareTime(userLive[userLive.size - 1].relativeTime, limitTime)
                 setFragmentResult("MainFragmentLimitTime", bundleOf("limitTime" to limitTime))
 
                 // 自分の位置情報のurl
                 val iconUrlHide = "https://onl.bz/dcMZVEa"
                 var url = "https://maps.googleapis.com/maps/api/staticmap" +
-                        "?center=${userLive[userLive.size-1].latitude},${userLive[userLive.size-1].longitude}" +
-                        "&size=310x640&scale=1" +
-                        "&zoom=18" +
-                        "&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ" +
-                        "&markers=icon:" + iconUrlHide + "|${userLive[userLive.size-1].latitude},${userLive[userLive.size-1].longitude}"
+                    "?center=${userLive[userLive.size - 1].latitude},${userLive[userLive.size - 1].longitude}" +
+                    "&size=310x640&scale=1" +
+                    "&zoom=18" +
+                    "&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ" +
+                    "&markers=icon:" + iconUrlHide + "|${userLive[userLive.size - 1].latitude},${userLive[userLive.size - 1].longitude}"
 
                 // 他人の位置を追加
                 Log.d("ALL_Location", allLocation.toString())
@@ -155,16 +155,15 @@ class MainFragment: Fragment() {
                     }
                 }
 
-
                 // trapの位置情報
                 if (allTraps.isNotEmpty()) {
                     for (i in allTraps.indices) {
                         if (allTraps[i].objId == 0) {
                             url += "&markers=icon:https://onl.bz/FetpS7Y|${allTraps[i].latitude},${allTraps[i].longitude}"
                         }
-                        if (viewModel.checkCaughtTrap(userLive[userLive.size-1], allTraps[i])) {
+                        if (viewModel.checkCaughtTrap(userLive[userLive.size - 1], allTraps[i])) {
                             // TrapにかかったらFragmentを移動
-                            setFragmentResult("MainFragmentTrapTime", bundleOf("trapTime" to userLive[userLive.size-1].relativeTime))
+                            setFragmentResult("MainFragmentTrapTime", bundleOf("trapTime" to userLive[userLive.size - 1].relativeTime))
 
                             findNavController().navigate(R.id.navigation_be_trapped)
                         }
@@ -176,18 +175,20 @@ class MainFragment: Fragment() {
                 // observeを二重にしてるせいで変な挙動していると思われる（放置するとメモリやばそう）
                 // この辺ちゃんと仕様わかってないので、リファクタリング時に修正する
                 if (skillTime != "") {
-                    viewModel.compareSkillTime(userLive[userLive.size-1].relativeTime,
-                        skillTime
+                    viewModel.compareSkillTime(
+                        userLive[userLive.size - 1].relativeTime,
+                        skillTime,
                     )
-                    progressSkill.progress = viewModel.howProgressSkillTime(userLive[userLive.size-1].relativeTime,
-                        skillTime
+                    progressSkill.progress = viewModel.howProgressSkillTime(
+                        userLive[userLive.size - 1].relativeTime,
+                        skillTime,
                     )
                     setFragmentResult("MainFragmentSkillTime", bundleOf("skillTime" to skillTime))
                 }
 
                 // URLから画像を取得
                 // 相対時間10秒おきに行う
-                if (userLive[userLive.size-1].relativeTime.substring(7, 8) == "0") {
+                if (userLive[userLive.size - 1].relativeTime.substring(7, 8) == "0") {
                     Log.d("fetchMAP", "Mapが更新されました")
                     coroutineScope.launch {
                         val originalBitmap = viewModel.fetchMap(url)

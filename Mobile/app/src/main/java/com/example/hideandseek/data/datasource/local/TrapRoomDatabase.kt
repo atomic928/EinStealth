@@ -9,14 +9,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Database(entities = [TrapData::class], version = 1, exportSchema = false)
-abstract class TrapRoomDatabase: RoomDatabase() {
+abstract class TrapRoomDatabase : RoomDatabase() {
 
-    abstract fun trapDao() : TrapDao
+    abstract fun trapDao(): TrapDao
 
     // アプリの起動時にデータベースを初期化する
     private class TrapRoomDatabaseCallback(
-        private val scope: CoroutineScope
-    ): RoomDatabase.Callback() {
+        private val scope: CoroutineScope,
+    ) : RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             INSTANCE?.let { database ->
@@ -36,13 +36,13 @@ abstract class TrapRoomDatabase: RoomDatabase() {
 
         fun getInstance(
             context: Context,
-            scope: CoroutineScope
+            scope: CoroutineScope,
         ): TrapRoomDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     TrapRoomDatabase::class.java,
-                    "trap_db"
+                    "trap_db",
                 )
                     .addCallback(TrapRoomDatabaseCallback(scope))
                     .build()

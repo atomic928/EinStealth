@@ -9,14 +9,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Database(entities = [UserData::class], version = 1, exportSchema = false)
-abstract class UserRoomDatabase: RoomDatabase() {
+abstract class UserRoomDatabase : RoomDatabase() {
 
-    abstract fun userDao() : UserDao
+    abstract fun userDao(): UserDao
 
     // アプリの起動時にデータベースを初期化する
     private class UserRoomDatabaseCallback(
-        private val scope: CoroutineScope
-    ): RoomDatabase.Callback() {
+        private val scope: CoroutineScope,
+    ) : RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             INSTANCE?.let { database ->
@@ -36,13 +36,13 @@ abstract class UserRoomDatabase: RoomDatabase() {
 
         fun getInstance(
             context: Context,
-            scope: CoroutineScope
+            scope: CoroutineScope,
         ): UserRoomDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     UserRoomDatabase::class.java,
-                    "user_db4"
+                    "user_db4",
                 )
                     .addCallback(UserRoomDatabaseCallback(scope))
                     .build()

@@ -15,7 +15,7 @@ interface AppContainer {
     val apiRepository: ApiRepository
 }
 
-class AppContainerImpl: AppContainer {
+class AppContainerImpl : AppContainer {
 
     // 10秒でタイムアウトとなるように設定
     private val client = OkHttpClient.Builder()
@@ -45,14 +45,14 @@ class AppContainerImpl: AppContainer {
 
     private fun isEmulator(): Boolean {
         return Build.FINGERPRINT.startsWith("generic") ||
-                Build.FINGERPRINT.startsWith("unknown") ||
-                Build.MODEL.contains("google_sdk") ||
-                Build.MODEL.contains("Emulator") ||
-                Build.MODEL.contains("Android SDK built for x86") ||
-                Build.MODEL.contains("sdk_phone_armv7") ||
-                Build.MANUFACTURER.contains("Genymotion") ||
-                (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")) ||
-                Build.PRODUCT == "google_sdk" ||
-                Build.PRODUCT == "sdk_gphone_x86"
+            Build.FINGERPRINT.startsWith("unknown") ||
+            Build.MODEL.contains("google_sdk") ||
+            Build.MODEL.contains("Emulator") ||
+            Build.MODEL.contains("Android SDK built for x86") ||
+            Build.MODEL.contains("sdk_phone_armv7") ||
+            Build.MANUFACTURER.contains("Genymotion") ||
+            (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")) ||
+            Build.PRODUCT == "google_sdk" ||
+            Build.PRODUCT == "sdk_gphone_x86"
     }
 }

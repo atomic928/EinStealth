@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import com.example.hideandseek.databinding.FragmentResultBinding
 import com.example.hideandseek.ui.viewmodel.ResultFragmentViewModel
 
-class ResultFragment: Fragment() {
+class ResultFragment : Fragment() {
     private var _binding: FragmentResultBinding? = null
     private val viewModel: ResultFragmentViewModel by viewModels()
 
@@ -18,7 +18,7 @@ class ResultFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentResultBinding.inflate(inflater, container, false)
         val root: View = binding.root

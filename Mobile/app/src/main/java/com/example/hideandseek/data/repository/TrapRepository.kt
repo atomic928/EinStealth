@@ -12,9 +12,9 @@ interface TrapRepository {
     suspend fun deleteAll()
 }
 
-class TrapRepositoryImpl (
-    private val trapDao: TrapDao
-): TrapRepository {
+class TrapRepositoryImpl(
+    private val trapDao: TrapDao,
+) : TrapRepository {
 
     override val allTraps: Flow<List<TrapData>>
         get() = trapDao.getAll()

@@ -1,8 +1,8 @@
 package com.example.hideandseek.data.repository
 
 import androidx.annotation.WorkerThread
-import com.example.hideandseek.data.datasource.local.LocationData
 import com.example.hideandseek.data.datasource.local.LocationDao
+import com.example.hideandseek.data.datasource.local.LocationData
 import kotlinx.coroutines.flow.Flow
 
 interface LocationRepository {
@@ -13,9 +13,9 @@ interface LocationRepository {
     suspend fun deleteAll()
 }
 
-class LocationRepositoryImpl (
-    private val locationDao: LocationDao
-): LocationRepository {
+class LocationRepositoryImpl(
+    private val locationDao: LocationDao,
+) : LocationRepository {
 
     override val allLocations: Flow<List<LocationData>>
         get() = locationDao.getAll()

@@ -9,12 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class WatchFragmentViewModel (
+class WatchFragmentViewModel(
     locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
-    private val mapRepository: MapRepository
-): ViewModel() {
+    private val mapRepository: MapRepository,
+) : ViewModel() {
     val allLocationsLive = locationRepository.allLocations.asLiveData()
     val allTrapsLive = trapRepository.allTraps.asLiveData()
     val userLive = userRepository.allUsers.asLiveData()
@@ -44,8 +44,8 @@ class WatchFragmentViewModelFactory(
     private val locationRepository: LocationRepository,
     private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
-    private val mapRepository: MapRepository
-): ViewModelProvider.Factory {
+    private val mapRepository: MapRepository,
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WatchFragmentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

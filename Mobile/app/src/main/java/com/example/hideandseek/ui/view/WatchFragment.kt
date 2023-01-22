@@ -18,14 +18,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class WatchFragment: Fragment() {
+class WatchFragment : Fragment() {
     private var _binding: FragmentWatchBinding? = null
     private val viewModel: WatchFragmentViewModel by viewModels {
         WatchFragmentViewModelFactory(
             (activity?.application as MainApplication).locationRepository,
             (activity?.application as MainApplication).trapRepository,
             (activity?.application as MainApplication).userRepository,
-            (activity?.application as MainApplication).mapRepository
+            (activity?.application as MainApplication).mapRepository,
         )
     }
 
@@ -36,7 +36,7 @@ class WatchFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentWatchBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -64,11 +64,11 @@ class WatchFragment: Fragment() {
                 // 自分の位置情報のurl
                 val iconUrlHide = "https://onl.bz/dcMZVEa"
                 var url = "https://maps.googleapis.com/maps/api/staticmap" +
-                        "?center=${userLive[userLive.size-1].latitude},${userLive[userLive.size-1].longitude}" +
-                        "&size=310x640&scale=1" +
-                        "&zoom=18" +
-                        "&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ" +
-                        "&markers=icon:" + iconUrlHide + "|${userLive[userLive.size-1].latitude},${userLive[userLive.size-1].longitude}"
+                    "?center=${userLive[userLive.size - 1].latitude},${userLive[userLive.size - 1].longitude}" +
+                    "&size=310x640&scale=1" +
+                    "&zoom=18" +
+                    "&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ" +
+                    "&markers=icon:" + iconUrlHide + "|${userLive[userLive.size - 1].latitude},${userLive[userLive.size - 1].longitude}"
 
                 // 他人の位置を追加
                 Log.d("ALL_Location", allLocation.toString())
@@ -94,7 +94,7 @@ class WatchFragment: Fragment() {
 
                 // URLから画像を取得
                 // 相対時間10秒おきに行う
-                if (userLive[userLive.size-1].relativeTime.substring(7, 8) == "0") {
+                if (userLive[userLive.size - 1].relativeTime.substring(7, 8) == "0") {
                     Log.d("fetchMAP", "Mapが更新されました")
                     coroutineScope.launch {
                         val originalBitmap = viewModel.fetchMap(url)

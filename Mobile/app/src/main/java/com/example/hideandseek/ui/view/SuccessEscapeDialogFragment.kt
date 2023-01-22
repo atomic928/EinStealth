@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.hideandseek.R
 import com.example.hideandseek.databinding.FragmentSuccessEscapeDialogBinding
 
-class SuccessEscapeDialogFragment: DialogFragment() {
+class SuccessEscapeDialogFragment : DialogFragment() {
     private var _binding: FragmentSuccessEscapeDialogBinding? = null
 
     private val binding get() = _binding!!
@@ -21,7 +21,7 @@ class SuccessEscapeDialogFragment: DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentSuccessEscapeDialogBinding.inflate(inflater, container, false)
         val root: View = binding.root

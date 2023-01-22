@@ -23,13 +23,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class BeTrappedFragment: Fragment() {
+class BeTrappedFragment : Fragment() {
     private var _binding: FragmentBeTrappedBinding? = null
     private val viewModel: BeTrappedFragmentViewModel by viewModels {
         BeTrappedViewModelFactory(
             (activity?.application as MainApplication).trapRepository,
             (activity?.application as MainApplication).userRepository,
-            (activity?.application as MainApplication).container.apiRepository
+            (activity?.application as MainApplication).container.apiRepository,
         )
     }
 
@@ -40,7 +40,7 @@ class BeTrappedFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentBeTrappedBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -48,24 +48,24 @@ class BeTrappedFragment: Fragment() {
         // Viewの取得
         // 時間表示の場所
         val tvRelativeTime: TextView = binding.tvRelativeTime
-        val tvLimitTime:    TextView = binding.tvLimitTime
+        val tvLimitTime: TextView = binding.tvLimitTime
 
         // 捕まったボタン
-        val btCaptureOn:      ImageView = binding.btCaptureOn
+        val btCaptureOn: ImageView = binding.btCaptureOn
 
         // スキルボタン
-        val btSkillOn:        ImageView   = binding.btSkillOn
-        val btSkillOff:       ImageView   = binding.btSkillOff
-        val progressSkill:    ProgressBar = binding.progressSkill
+        val btSkillOn: ImageView = binding.btSkillOn
+        val btSkillOff: ImageView = binding.btSkillOff
+        val progressSkill: ProgressBar = binding.progressSkill
 
         fun changeBtSkillVisible(isOn: Boolean) {
             if (isOn) {
-                btSkillOn.visibility     = View.VISIBLE
-                btSkillOff.visibility    = View.INVISIBLE
+                btSkillOn.visibility = View.VISIBLE
+                btSkillOff.visibility = View.INVISIBLE
                 progressSkill.visibility = View.INVISIBLE
             } else {
-                btSkillOn.visibility     = View.INVISIBLE
-                btSkillOff.visibility    = View.VISIBLE
+                btSkillOn.visibility = View.INVISIBLE
+                btSkillOff.visibility = View.VISIBLE
                 progressSkill.visibility = View.VISIBLE
 
                 progressSkill.max = 60
@@ -75,13 +75,13 @@ class BeTrappedFragment: Fragment() {
         // 2重LiveData解消のために変数定義
         var limitTime = ""
         var skillTime = ""
-        var trapTime  = ""
+        var trapTime = ""
 
         // Trapが解除されるまでのプログレスバー
-        val progressTrap:     ProgressBar = binding.progressTrap
+        val progressTrap: ProgressBar = binding.progressTrap
         progressTrap.max = 60
 
-        setFragmentResultListener("MainFragmentLimitTime") {_, bundle ->
+        setFragmentResultListener("MainFragmentLimitTime") { _, bundle ->
             val result = bundle.getString("limitTime")
             Log.d("limitTimeResultListener", result.toString())
             tvLimitTime.text = result
@@ -90,7 +90,7 @@ class BeTrappedFragment: Fragment() {
             }
         }
 
-        setFragmentResultListener("MainFragmentTrapTime") {_, bundle ->
+        setFragmentResultListener("MainFragmentTrapTime") { _, bundle ->
             val result = bundle.getString("trapTime")
             Log.d("trapTimeResultListener", result.toString())
             if (result != null) {
@@ -98,7 +98,7 @@ class BeTrappedFragment: Fragment() {
             }
         }
 
-        setFragmentResultListener("MainFragmentSkillTime") {_, bundle ->
+        setFragmentResultListener("MainFragmentSkillTime") { _, bundle ->
             val result = bundle.getString("skillTime")
             Log.d("skillTimeResultListener", result.toString())
             if (result != null) {
@@ -106,7 +106,7 @@ class BeTrappedFragment: Fragment() {
             }
         }
 
-        setFragmentResultListener("MainFragmentIsOverSkillTime") {_, bundle ->
+        setFragmentResultListener("MainFragmentIsOverSkillTime") { _, bundle ->
             val result = bundle.getBoolean("isOverSkillTime")
             Log.d("isOverSKillTimeResultListener", result.toString())
             viewModel.setIsOverSkillTime(result)
@@ -120,13 +120,13 @@ class BeTrappedFragment: Fragment() {
         viewModel.userLive.observe(viewLifecycleOwner) { userLive ->
             Log.d("UserLive", userLive.toString())
             if (userLive.isNotEmpty()) {
-                tvRelativeTime.text = userLive[userLive.size-1].relativeTime
+                tvRelativeTime.text = userLive[userLive.size - 1].relativeTime
                 // 制限時間になったかどうかの判定
-                viewModel.compareTime(userLive[userLive.size-1].relativeTime, limitTime)
+                viewModel.compareTime(userLive[userLive.size - 1].relativeTime, limitTime)
 
                 // trapにかかっている時間を計測
-                viewModel.compareTrapTime(userLive[userLive.size-1].relativeTime, trapTime)
-                val howProgressTrap = viewModel.howProgressTrapTime(userLive[userLive.size-1].relativeTime, trapTime)
+                viewModel.compareTrapTime(userLive[userLive.size - 1].relativeTime, trapTime)
+                val howProgressTrap = viewModel.howProgressTrapTime(userLive[userLive.size - 1].relativeTime, trapTime)
                 progressTrap.progress = howProgressTrap
 
                 // Skill Buttonの Progress Bar
@@ -134,11 +134,13 @@ class BeTrappedFragment: Fragment() {
                 // observeを二重にしてるせいで変な挙動していると思われる（放置するとメモリやばそう）
                 // この辺ちゃんと仕様わかってないので、リファクタリング時に修正する
                 if (skillTime != "") {
-                    viewModel.compareSkillTime(userLive[userLive.size-1].relativeTime,
-                        skillTime
+                    viewModel.compareSkillTime(
+                        userLive[userLive.size - 1].relativeTime,
+                        skillTime,
                     )
-                    progressSkill.progress = viewModel.howProgressSkillTime(userLive[userLive.size-1].relativeTime,
-                        skillTime
+                    progressSkill.progress = viewModel.howProgressSkillTime(
+                        userLive[userLive.size - 1].relativeTime,
+                        skillTime,
                     )
                     setFragmentResult("BeTrappedFragmentSkillTime", bundleOf("skillTime" to skillTime))
                 }

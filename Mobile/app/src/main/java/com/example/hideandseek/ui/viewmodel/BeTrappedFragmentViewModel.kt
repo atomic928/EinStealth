@@ -12,11 +12,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class BeTrappedFragmentViewModel (
+class BeTrappedFragmentViewModel(
     private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
-    private val apiRepository: ApiRepository
-    ): ViewModel() {
+    private val apiRepository: ApiRepository,
+) : ViewModel() {
     val userLive = userRepository.allUsers.asLiveData()
 
     suspend fun getNowUser(): UserData {
@@ -75,20 +75,20 @@ class BeTrappedFragmentViewModel (
     }
 
     fun howProgressSkillTime(relativeTime: String, skillTime: String): Int {
-        Log.d("HowProgress", ((60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60).toString())
+        Log.d("HowProgress", ((60 + relativeTime.substring(6).toInt() - skillTime.substring(6).toInt()) % 60).toString())
         return if (relativeTime.substring(6).toInt() < skillTime.substring(6).toInt()) {
-            (60+relativeTime.substring(6).toInt()-skillTime.substring(6).toInt())%60
+            (60 + relativeTime.substring(6).toInt() - skillTime.substring(6).toInt()) % 60
         } else {
-            relativeTime.substring(6).toInt()-skillTime.substring(6).toInt()
+            relativeTime.substring(6).toInt() - skillTime.substring(6).toInt()
         }
     }
 
     fun howProgressTrapTime(relativeTime: String, trapTime: String): Int {
-        Log.d("HowProgressTrap", ((60+relativeTime.substring(6).toInt()-trapTime.substring(6).toInt())%60).toString())
+        Log.d("HowProgressTrap", ((60 + relativeTime.substring(6).toInt() - trapTime.substring(6).toInt()) % 60).toString())
         return if (relativeTime.substring(6).toInt() < trapTime.substring(6).toInt()) {
-            (60+relativeTime.substring(6).toInt()-trapTime.substring(6).toInt())%60
+            (60 + relativeTime.substring(6).toInt() - trapTime.substring(6).toInt()) % 60
         } else {
-            relativeTime.substring(6).toInt()-trapTime.substring(6).toInt()
+            relativeTime.substring(6).toInt() - trapTime.substring(6).toInt()
         }
     }
 
@@ -100,14 +100,14 @@ class BeTrappedFragmentViewModel (
         viewModelScope.launch(Dispatchers.IO) {
             val nowUser = userRepository.getLatest()
             try {
-                val request = PostData.PostSpacetime(nowUser.relativeTime.substring(0, 7)+ "0", nowUser.latitude, nowUser.longitude, nowUser.altitude, 1)
+                val request = PostData.PostSpacetime(nowUser.relativeTime.substring(0, 7) + "0", nowUser.latitude, nowUser.longitude, nowUser.altitude, 1)
                 val response = apiRepository.postSpacetime(request)
                 if (response.isSuccessful) {
                     Log.d("POST_TEST", "${response}\n${response.body()}")
                 } else {
                     Log.d("POST_TEST", "$response")
                 }
-            } catch (e: java.lang.Exception){
+            } catch (e: java.lang.Exception) {
                 Log.d("POST_TEST", "$e")
             }
         }
@@ -117,8 +117,8 @@ class BeTrappedFragmentViewModel (
 class BeTrappedViewModelFactory(
     private val trapRepository: TrapRepository,
     private val userRepository: UserRepository,
-    private val apiRepository: ApiRepository
-): ViewModelProvider.Factory {
+    private val apiRepository: ApiRepository,
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(BeTrappedFragmentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
