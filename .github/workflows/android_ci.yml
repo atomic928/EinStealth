@@ -41,10 +41,12 @@ jobs:
 
     # 依存関係の出力
     - name: Displays the Android dependencies of the project
+      working-directory: ./Mobile
       run: ./gradlew androidDependencies
 
     # コンパイル
     - name: Run Compile
+      working-directory: ./Mobile
       run: ./gradlew assembleDebug
 
   test:
@@ -70,10 +72,12 @@ jobs:
 
     # テスト
     - name: Test with Gradle
+      working-directory: ./Mobile
       run: ./gradlew test --stacktrace
 
     # コードカバレッジをJaCoCo形式で取得
     - name: Get code coverage for JaCoCo
+      working-directory: ./Mobile
       run: ./gradlew jacocoDebugTestReport
 
     # コードカバレッジをCodecovへアップロード
@@ -103,6 +107,7 @@ jobs:
 
     # 静的解析
     - name: Run Inspection
+      working-directory: ./Mobile
       run: ./gradlew lint
 
     # 結果の表示
@@ -131,6 +136,7 @@ jobs:
 
     # 静的解析
     - name: Lint with detekt
+      working-directory: ./Mobile
       run: ./gradlew detekt
 
     # アーティファクトへアップロード
