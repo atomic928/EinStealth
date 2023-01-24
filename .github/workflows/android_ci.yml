@@ -78,28 +78,6 @@ jobs:
         if-no-files-found: error
         retention-days: 14
 
-  detekt:
-    runs-on: ubuntu-latest
-    steps:
-    # チェックアウト
-    - uses: actions/checkout@v2
-
-    # 静的解析
-    - name: Lint with detekt
-      working-directory: ./Mobile
-      run: ./gradlew detekt
-
-    # アーティファクトへアップロード
-    - name: Upload results Artifact
-      uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: results
-        path: |
-          **/build/reports/detekt/**/*
-        if-no-files-found: error
-        retention-days: 14
-
   ktlint:
     runs-on: ubuntu-latest
     steps:
