@@ -46,10 +46,13 @@ jobs:
           path: ${{ steps.gem-info.outputs.dir }}
           key: ${{ runner.os }}-gem-${{ steps.gem-info.outputs.key }}
       - name: Run ktlint
+        working-directory: ./Mobile
         run: ./gradlew $GRADLE_KTLINT_TASK
       - name: Run Android Lint
+        working-directory: ./Mobile
         run: ./gradlew $GRADLE_ANDROID_LINT_TASK
       - name: Run Unit Test
+        working-directory: ./Mobile
         run: ./gradlew $GRADLE_UNIT_TEST_TASK
       - name: Set up and run Danger
         if: cancelled() != true # 中断されない限り、エラーでも実行
