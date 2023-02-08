@@ -104,4 +104,4 @@ Web（紹介用サイト）：Vue.js, Liquid JS (forkしたものを使用)
 
 **その他開発に使用したツール・サービス**
 
-Figma, Android Studio, Notion, After Effects, GitHub,  VScode, GitHub Actions, Vim
+Figma, Android Studio, Notion, After Effects, GitHub,  VScode, GitHub Actions, Vim, Bitrise
